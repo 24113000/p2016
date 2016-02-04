@@ -8,6 +8,6 @@ public abstract class AbstractFile {
     private String type;
 
     public boolean isFolder() {
-        return this.getClass().getCanonicalName().equals(Folder.class.getCanonicalName());
+        return this.getClass().getCanonicalName().equals(SimpleFolder.class.getCanonicalName());
     }
 }

@@ -7,17 +7,17 @@ import org.sbezgin.p2016.db.dto.file.AbstractFile;
 import java.util.List;
 
 public interface MainFileService {
-    AbstractFile getFileByID(long resID);
+    AbstractFile getFileByID(long fileID);
 
     Folder getFolder(long folderID);
 
-    void saveFile(AbstractFile res);
+    void saveFile(AbstractFile file);
 
-    void setPermission(long resID, Permission perm);
+    void setPermission(long fileD, Permission perm);
 
-    void renameFile(long resID, String newName);
+    void renameFile(long fileID, String newName);
 
-    void deleteFile(long resID, boolean recursively);
+    void deleteFile(long fileID, boolean recursively);
 
     List<AbstractFile> getRootFiles();
 

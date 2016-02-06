@@ -1,4 +1,4 @@
-package org.sbezgin.p2016.db.dto.file;
+package org.sbezgin.p2016.db.entity.file;
 
 import org.sbezgin.p2016.common.FileType;
 

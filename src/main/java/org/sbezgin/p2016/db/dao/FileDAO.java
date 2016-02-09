@@ -3,14 +3,14 @@ package org.sbezgin.p2016.db.dao;
 
 import org.sbezgin.p2016.db.entity.User;
 import org.sbezgin.p2016.db.entity.file.AbstractFile;
-import org.sbezgin.p2016.db.entity.file.SimpleFolder;
+import org.sbezgin.p2016.db.entity.file.Folder;
 
 import java.util.List;
 
 public interface FileDAO {
     AbstractFile getFileByID(User user, long fileID);
 
-    SimpleFolder getFolder(User user, long folderID);
+    Folder getFolder(User user, long folderID);
 
     void saveOrUpdateFile(User user, AbstractFile file);
 

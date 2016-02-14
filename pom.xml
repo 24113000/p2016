@@ -82,5 +82,47 @@
     </dependencies>
     <build>
         <finalName>p2016</finalName>
+        <plugins>
+            <plugin>
+
+                <!-- current version -->
+                <groupId>fr.avianey.mojo</groupId>
+                <artifactId>hsqldb-maven-plugin</artifactId>
+                <version>1.0.0</version>
+
+                <!--
+                    default value for in memory jdbc:hsqldb:hsql://localhost/xdb
+                    override only values you want to change
+                -->
+                <configuration>
+                    <driver>org.hsqldb.jdbcDriver</driver>
+                    <path>mem:test</path>
+                    <address>localhost</address>
+                    <name>xdb</name>
+                    <username>sa</username>
+                    <password></password>
+                    <validationQuery>SELECT 1 FROM INFORMATION_SCHEMA.SYSTEM_USERS</validationQuery>
+                </configuration>
+
+                <!-- call start and stop -->
+                <executions>
+                    <execution>
+                        <id>start-hsqldb</id>
+                        <phase>process-test-classes</phase>
+                        <goals>
+                            <goal>start</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>stop-hsqldb</id>
+                        <phase>post-integration-test</phase>
+                        <goals>
+                            <goal>stop</goal>
+                        </goals>
+                    </execution>
+                </executions>
+
+            </plugin>
+        </plugins>
     </build>
 </project>

@@ -6,7 +6,7 @@ import org.sbezgin.p2016.db.dto.file.AbstractFile;
 
 import java.util.List;
 
-public interface MainFileService {
+public interface FileService {
     AbstractFile getFileByID(long fileID);
 
     SimpleFolder getFolder(long folderID);

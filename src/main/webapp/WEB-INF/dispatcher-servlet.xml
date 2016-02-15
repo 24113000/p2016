@@ -8,7 +8,9 @@ http://www.springframework.org/schema/beans    http://www.springframework.org/sc
 http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
 http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd">
 
-    <bean name="/hello.html" class="org.sbezgin.p2016.mvc.P2016MainController"/>
+    <bean name="/hello.html" class="org.sbezgin.p2016.mvc.P2016MainController">
+        <property name="fileService" ref="fileService"/>
+    </bean>
     <!-- Resolves view names to protected .jsp resources within the /WEB-INF/views directory -->
     <bean id="viewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
         <property name="prefix" value="/WEB-INF/jsp/"/>

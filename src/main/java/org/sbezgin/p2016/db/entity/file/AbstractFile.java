@@ -21,6 +21,7 @@ public abstract class AbstractFile {
     private String idPath;
     private long parentId;
     private String className;
+    private int ownerID;
 
     @Id
     @GeneratedValue(strategy = GenerationType.TABLE, generator="FILE_GEN")
@@ -77,6 +78,15 @@ public abstract class AbstractFile {
         this.className = className;
     }
 
+    @Column(name = "owner_id", nullable = false)
+    public int getOwnerID() {
+        return ownerID;
+    }
+
+    public void setOwnerID(int ownerID) {
+        this.ownerID = ownerID;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -85,6 +95,7 @@ public abstract class AbstractFile {
         AbstractFile that = (AbstractFile) o;
 
         if (id != that.id) return false;
+        if (ownerID != that.ownerID) return false;
         if (parentId != that.parentId) return false;
         if (className != null ? !className.equals(that.className) : that.className != null) return false;
         if (idPath != null ? !idPath.equals(that.idPath) : that.idPath != null) return false;
@@ -102,6 +113,7 @@ public abstract class AbstractFile {
         result = 31 * result + (idPath != null ? idPath.hashCode() : 0);
         result = 31 * result + (int) (parentId ^ (parentId >>> 32));
         result = 31 * result + (className != null ? className.hashCode() : 0);
+        result = 31 * result + ownerID;
         return result;
     }
 }

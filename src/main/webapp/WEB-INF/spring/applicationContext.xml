@@ -9,6 +9,25 @@
                             http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.0.xsd
                             http://www.springframework.org/schema/tx  http://www.springframework.org/schema/tx/spring-tx-4.0.xsd">
 
-    <bean name="fileService" class="org.sbezgin.p2016.services.file.impl.FileServiceImpl"></bean>
+    <bean name="dozer" class="org.dozer.DozerBeanMapper" />
 
+    <bean name="beanTransformer" class="org.sbezgin.p2016.services.impl.BeanTransformerImpl">
+        <property name="dozerBeanMapper" ref="dozer"/>
+        <property name="beanMap">
+            <map>
+                <entry key="org.sbezgin.p2016.db.dto.file.Folder" value="org.sbezgin.p2016.db.entity.file.Folder"/>
+            </map>
+        </property>
+    </bean>
+
+    <!-- services -->
+    <bean name="fileService" class="org.sbezgin.p2016.services.file.impl.FileServiceImpl">
+        <property name="fileDAO" ref="fileDAO" />
+        <property name="beanTransformer" ref="beanTransformer"/>
+    </bean>
+
+    <!-- dao -->
+    <bean name="fileDAO" class="org.sbezgin.p2016.db.dao.impl.FileDAOImpl">
+        <property name="sessionFactory" ref="sessionFactory"/>
+    </bean>
 </beans>

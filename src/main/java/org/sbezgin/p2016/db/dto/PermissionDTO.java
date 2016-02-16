@@ -1,4 +1,4 @@
 package org.sbezgin.p2016.db.dto;
 
-public class Permission {
+public class PermissionDTO {
 }

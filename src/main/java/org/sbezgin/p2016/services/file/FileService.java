@@ -1,27 +1,27 @@
 package org.sbezgin.p2016.services.file;
 
-import org.sbezgin.p2016.db.dto.file.Folder;
-import org.sbezgin.p2016.db.dto.Permission;
-import org.sbezgin.p2016.db.dto.file.AbstractFile;
+import org.sbezgin.p2016.db.dto.file.FolderDTO;
+import org.sbezgin.p2016.db.dto.PermissionDTO;
+import org.sbezgin.p2016.db.dto.file.AbstractFileDTO;
 
 import java.util.List;
 
 public interface FileService {
-    AbstractFile getFileByID(long fileID);
+    AbstractFileDTO getFileByID(long fileID);
 
-    Folder getFolder(long folderID);
+    FolderDTO getFolder(long folderID);
 
-    void saveFile(AbstractFile file);
+    void saveFile(AbstractFileDTO file);
 
-    void setPermission(long fileD, Permission perm);
+    void setPermission(long fileD, PermissionDTO perm);
 
     void renameFile(long fileID, String newName);
 
     void deleteFile(long fileID, boolean recursively);
 
-    List<AbstractFile> getRootFiles();
+    List<AbstractFileDTO> getRootFiles();
 
-    List<AbstractFile> getChildren(long folderID);
+    List<AbstractFileDTO> getChildren(long folderID);
 
-    List<AbstractFile> getFilesByType(String javaType);
+    List<AbstractFileDTO> getFilesByType(String javaType);
 }

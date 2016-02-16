@@ -1,11 +1,15 @@
 package org.sbezgin.p2016.services.file.impl;
 
 import org.sbezgin.p2016.db.dao.FileDAO;
-import org.sbezgin.p2016.db.dto.Permission;
-import org.sbezgin.p2016.db.dto.file.AbstractFile;
-import org.sbezgin.p2016.db.dto.file.Folder;
+import org.sbezgin.p2016.db.dto.PermissionDTO;
+import org.sbezgin.p2016.db.dto.file.AbstractFileDTO;
+import org.sbezgin.p2016.db.dto.file.FolderDTO;
+import org.sbezgin.p2016.db.entity.User;
+import org.sbezgin.p2016.db.entity.file.AbstractFile;
 import org.sbezgin.p2016.services.BeanTransformer;
 import org.sbezgin.p2016.services.file.FileService;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -14,22 +18,29 @@ public class FileServiceImpl implements FileService {
     private BeanTransformer beanTransformer;
 
     @Override
-    public AbstractFile getFileByID(long fileID) {
+    public AbstractFileDTO getFileByID(long fileID) {
         return null;
     }
 
     @Override
-    public Folder getFolder(long folderID) {
+    public FolderDTO getFolder(long folderID) {
         return null;
     }
 
+    @Transactional(propagation = Propagation.REQUIRED)
     @Override
-    public void saveFile(AbstractFile file) {
-        fileDAO.saveOrUpdateFile();
+    public void saveFile(AbstractFileDTO file) {
+        Long id = file.getId();
+        if (id == null) {
+            AbstractFile fileEntity = (AbstractFile) beanTransformer.transformDTOToEntity(file);
+            User user = new User();
+            user.setId(1);
+            fileDAO.saveOrUpdateFile(user, fileEntity);
+        }
     }
 
     @Override
-    public void setPermission(long fileD, Permission perm) {
+    public void setPermission(long fileD, PermissionDTO perm) {
 
     }
 
@@ -44,17 +55,17 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    public List<AbstractFile> getRootFiles() {
+    public List<AbstractFileDTO> getRootFiles() {
         return null;
     }
 
     @Override
-    public List<AbstractFile> getChildren(long folderID) {
+    public List<AbstractFileDTO> getChildren(long folderID) {
         return null;
     }
 
     @Override
-    public List<AbstractFile> getFilesByType(String javaType) {
+    public List<AbstractFileDTO> getFilesByType(String javaType) {
         return null;
     }
 

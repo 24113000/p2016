@@ -2,10 +2,13 @@ package org.sbezgin.p2016.db.dao.impl;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 import org.sbezgin.p2016.db.dao.FileDAO;
 import org.sbezgin.p2016.db.entity.User;
 import org.sbezgin.p2016.db.entity.file.AbstractFile;
 import org.sbezgin.p2016.db.entity.file.Folder;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -23,10 +26,13 @@ public class FileDAOImpl implements FileDAO {
         return null;
     }
 
+    @Transactional(propagation = Propagation.REQUIRED)
     @Override
     public void saveOrUpdateFile(User user, AbstractFile file) {
         Session session = getSession();
-        session.saveOrUpdate(file);
+        file.setClassName(file.getClass().getCanonicalName());
+        file.setOwnerID(user.getId());
+        session.save(file);
     }
 
     @Override

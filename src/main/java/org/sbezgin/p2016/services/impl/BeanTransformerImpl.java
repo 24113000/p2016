@@ -16,7 +16,7 @@ public class BeanTransformerImpl implements BeanTransformer {
 
     @Override
     public Object transformEntityToDTO(Object obj) {
-        String dtoClassName = (String) beanMap.get(obj.getClass().getCanonicalName());
+        String dtoClassName = (String) beanMap.getKey(obj.getClass().getCanonicalName());
         return transForm(obj, dtoClassName);
     }
 
@@ -35,7 +35,7 @@ public class BeanTransformerImpl implements BeanTransformer {
 
     @Override
     public Object transformDTOToEntity(Object obj) {
-        String entityClassName = (String) beanMap.getKey(obj.getClass().getCanonicalName());
+        String entityClassName = (String) beanMap.get(obj.getClass().getCanonicalName());
         return transForm(obj, entityClassName);
     }
 

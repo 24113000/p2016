@@ -1,6 +1,6 @@
 package org.sbezgin.p2016.mvc;
 
-import org.sbezgin.p2016.db.dto.file.Folder;
+import org.sbezgin.p2016.db.dto.file.FolderDTO;
 import org.sbezgin.p2016.services.file.FileService;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.AbstractController;
@@ -15,7 +15,7 @@ public class P2016MainController extends AbstractController {
     @Override
     protected ModelAndView handleRequestInternal(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws Exception {
         ModelAndView mv = new ModelAndView();
-        Folder simpleFolder = new Folder();
+        FolderDTO simpleFolder = new FolderDTO();
         simpleFolder.setName("ROOT");
         simpleFolder.setParentId(null);
         simpleFolder.setIdPath("/");

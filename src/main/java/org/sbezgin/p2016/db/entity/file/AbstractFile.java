@@ -13,23 +13,23 @@ import javax.persistence.*;
 
 @Entity
 @Table(name = "file")
-@Inheritance(strategy= InheritanceType.TABLE_PER_CLASS)
+@Inheritance(strategy= InheritanceType.JOINED)
 public abstract class AbstractFile {
-    private long id;
+    private Long id;
     private String name;
     private String path;
     private String idPath;
-    private long parentId;
+    private Long parentId;
     private String className;
-    private int ownerID;
+    private Integer ownerID;
 
     @Id
     @GeneratedValue(strategy = GenerationType.TABLE, generator="FILE_GEN")
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -60,12 +60,12 @@ public abstract class AbstractFile {
         this.idPath = idPath;
     }
 
-    @Column(name = "parent_id", nullable = false)
-    public long getParentId() {
+    @Column(name = "parent_id", nullable = true)
+    public Long getParentId() {
         return parentId;
     }
 
-    public void setParentId(long parentId) {
+    public void setParentId(Long parentId) {
         this.parentId = parentId;
     }
 
@@ -79,11 +79,11 @@ public abstract class AbstractFile {
     }
 
     @Column(name = "owner_id", nullable = false)
-    public int getOwnerID() {
+    public Integer getOwnerID() {
         return ownerID;
     }
 
-    public void setOwnerID(int ownerID) {
+    public void setOwnerID(Integer ownerID) {
         this.ownerID = ownerID;
     }
 
@@ -94,12 +94,12 @@ public abstract class AbstractFile {
 
         AbstractFile that = (AbstractFile) o;
 
-        if (id != that.id) return false;
         if (ownerID != that.ownerID) return false;
-        if (parentId != that.parentId) return false;
         if (className != null ? !className.equals(that.className) : that.className != null) return false;
+        if (id != null ? !id.equals(that.id) : that.id != null) return false;
         if (idPath != null ? !idPath.equals(that.idPath) : that.idPath != null) return false;
         if (name != null ? !name.equals(that.name) : that.name != null) return false;
+        if (parentId != null ? !parentId.equals(that.parentId) : that.parentId != null) return false;
         if (path != null ? !path.equals(that.path) : that.path != null) return false;
 
         return true;
@@ -107,11 +107,11 @@ public abstract class AbstractFile {
 
     @Override
     public int hashCode() {
-        int result = (int) (id ^ (id >>> 32));
+        int result = id != null ? id.hashCode() : 0;
         result = 31 * result + (name != null ? name.hashCode() : 0);
         result = 31 * result + (path != null ? path.hashCode() : 0);
         result = 31 * result + (idPath != null ? idPath.hashCode() : 0);
-        result = 31 * result + (int) (parentId ^ (parentId >>> 32));
+        result = 31 * result + (parentId != null ? parentId.hashCode() : 0);
         result = 31 * result + (className != null ? className.hashCode() : 0);
         result = 31 * result + ownerID;
         return result;

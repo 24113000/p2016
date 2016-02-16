@@ -1,6 +1,6 @@
 package org.sbezgin.p2016.db.dto;
 
-public class User {
+public class UserDTO {
     private int id;
     private String email;
     private String password;
@@ -34,7 +34,7 @@ public class User {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        User user = (User) o;
+        UserDTO user = (UserDTO) o;
 
         if (id != user.id) return false;
         if (email != null ? !email.equals(user.email) : user.email != null) return false;

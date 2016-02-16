@@ -1,6 +1,6 @@
 package org.sbezgin.p2016.db.dto.file;
 
-public abstract class AbstractFile {
+public abstract class AbstractFileDTO {
     private Long id;
     private String name;
     private String path;
@@ -39,7 +39,7 @@ public abstract class AbstractFile {
         this.idPath = idPath;
     }
 
-    public long getParentId() {
+    public Long getParentId() {
         return parentId;
     }
 
@@ -52,7 +52,7 @@ public abstract class AbstractFile {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        AbstractFile that = (AbstractFile) o;
+        AbstractFileDTO that = (AbstractFileDTO) o;
 
         if (id != null ? !id.equals(that.id) : that.id != null) return false;
         if (idPath != null ? !idPath.equals(that.idPath) : that.idPath != null) return false;

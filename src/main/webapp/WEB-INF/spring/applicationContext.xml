@@ -15,7 +15,7 @@
         <property name="dozerBeanMapper" ref="dozer"/>
         <property name="beanMap">
             <map>
-                <entry key="org.sbezgin.p2016.db.dto.file.Folder" value="org.sbezgin.p2016.db.entity.file.Folder"/>
+                <entry key="org.sbezgin.p2016.db.dto.file.FolderDTO" value="org.sbezgin.p2016.db.entity.file.Folder"/>
             </map>
         </property>
     </bean>

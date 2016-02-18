@@ -4,9 +4,11 @@ package org.sbezgin.p2016.db.dao;
 import org.sbezgin.p2016.db.entity.User;
 import org.sbezgin.p2016.db.entity.file.AbstractFile;
 import org.sbezgin.p2016.db.entity.file.Folder;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+@Transactional
 public interface FileDAO {
     AbstractFile getFileByID(User user, long fileID);
 

@@ -1,5 +1,6 @@
 package org.sbezgin.p2016.db.dao.impl;
 
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -47,7 +48,11 @@ public class FileDAOImpl implements FileDAO {
 
     @Override
     public List<AbstractFile> getRootFiles(User user) {
-        return null;
+        Session session = getSession();
+        Query query = session.createQuery("from AbstractFile as file where file.ownerID = :ownerId and file.parentId is null ");
+        query.setParameter("ownerId", user.getId());
+        List list = query.list();
+        return list;
     }
 
     @Override

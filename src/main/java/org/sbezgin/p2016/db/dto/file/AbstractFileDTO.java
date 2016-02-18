@@ -54,7 +54,6 @@ public abstract class AbstractFileDTO {
 
         AbstractFileDTO that = (AbstractFileDTO) o;
 
-        if (id != null ? !id.equals(that.id) : that.id != null) return false;
         if (idPath != null ? !idPath.equals(that.idPath) : that.idPath != null) return false;
         if (name != null ? !name.equals(that.name) : that.name != null) return false;
         if (parentId != null ? !parentId.equals(that.parentId) : that.parentId != null) return false;
@@ -65,8 +64,7 @@ public abstract class AbstractFileDTO {
 
     @Override
     public int hashCode() {
-        int result = id != null ? id.hashCode() : 0;
-        result = 31 * result + (name != null ? name.hashCode() : 0);
+        int result = name != null ? name.hashCode() : 0;
         result = 31 * result + (path != null ? path.hashCode() : 0);
         result = 31 * result + (idPath != null ? idPath.hashCode() : 0);
         result = 31 * result + (parentId != null ? parentId.hashCode() : 0);

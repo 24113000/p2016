@@ -11,8 +11,11 @@ import org.sbezgin.p2016.services.file.FileService;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
+@Transactional
 public class FileServiceImpl implements FileService {
     private FileDAO fileDAO;
     private BeanTransformer beanTransformer;
@@ -56,7 +59,16 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public List<AbstractFileDTO> getRootFiles() {
-        return null;
+        User user = new User();
+        user.setId(1);
+        List<AbstractFile> rootFiles = fileDAO.getRootFiles(user);
+        List<AbstractFileDTO> abstractFileDTOs = new ArrayList<>(rootFiles.size());
+        abstractFileDTOs.addAll(
+                rootFiles.stream().map(
+                        rootFile -> (AbstractFileDTO) beanTransformer.transformEntityToDTO(rootFile)
+                ).collect(Collectors.toList())
+        );
+        return abstractFileDTOs;
     }
 
     @Override

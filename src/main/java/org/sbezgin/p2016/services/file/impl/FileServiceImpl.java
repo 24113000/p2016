@@ -1,13 +1,16 @@
 package org.sbezgin.p2016.services.file.impl;
 
+import org.sbezgin.p2016.common.P2016Exception;
 import org.sbezgin.p2016.db.dao.FileDAO;
 import org.sbezgin.p2016.db.dto.PermissionDTO;
+import org.sbezgin.p2016.db.dto.UserDTO;
 import org.sbezgin.p2016.db.dto.file.AbstractFileDTO;
 import org.sbezgin.p2016.db.dto.file.FolderDTO;
 import org.sbezgin.p2016.db.entity.User;
 import org.sbezgin.p2016.db.entity.file.AbstractFile;
 import org.sbezgin.p2016.services.BeanTransformer;
 import org.sbezgin.p2016.services.file.FileService;
+import org.sbezgin.p2016.services.impl.UserServiceImpl;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,6 +22,7 @@ import java.util.stream.Collectors;
 public class FileServiceImpl implements FileService {
     private FileDAO fileDAO;
     private BeanTransformer beanTransformer;
+    private UserServiceImpl userService;
 
     @Override
     public AbstractFileDTO getFileByID(long fileID) {
@@ -33,12 +37,32 @@ public class FileServiceImpl implements FileService {
     @Transactional(propagation = Propagation.REQUIRED)
     @Override
     public void saveFile(AbstractFileDTO file) {
+        UserDTO currentUser = userService.getCurrentUser();
         Long id = file.getId();
         if (id == null) {
             AbstractFile fileEntity = (AbstractFile) beanTransformer.transformDTOToEntity(file);
-            User user = new User();
-            user.setId(1);
-            fileDAO.saveOrUpdateFile(user, fileEntity);
+            fileEntity.setClassName(file.getClass().getCanonicalName());
+            int userID = currentUser.getId();
+            fileEntity.setOwnerID(userID);
+
+            Long parentId = fileEntity.getParentId();
+
+            if (parentId == null) { //root
+                fileEntity.setPath("/");
+                fileEntity.setIdPath("/");
+            } else {
+                AbstractFile parent = fileDAO.getFileByID(userID, parentId);
+                if (parent == null) {
+                    throw new P2016Exception("Cannot get parent folder by ID " + parentId + " and user ID " + userID);
+                }
+                String newPathId = parent.getIdPath() + "/" + parentId;
+                String newPath = parent.getPath() + "/" + parent.getName();
+
+                fileEntity.setIdPath(newPathId);
+                fileEntity.setPath(newPath);
+            }
+
+            fileDAO.saveOrUpdateFile(userID, fileEntity);
         }
     }
 
@@ -58,22 +82,31 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    public List<AbstractFileDTO> getRootFiles() {
-        User user = new User();
-        user.setId(1);
-        List<AbstractFile> rootFiles = fileDAO.getRootFiles(user);
-        List<AbstractFileDTO> abstractFileDTOs = new ArrayList<>(rootFiles.size());
-        abstractFileDTOs.addAll(
-                rootFiles.stream().map(
-                        rootFile -> (AbstractFileDTO) beanTransformer.transformEntityToDTO(rootFile)
-                ).collect(Collectors.toList())
-        );
-        return abstractFileDTOs;
+    public FolderDTO getRootFolder() {
+        UserDTO currentUser = userService.getCurrentUser();
+        List<AbstractFile> rootFiles = fileDAO.getRootFiles(currentUser.getId());
+
+        if (rootFiles.size() == 0) {
+            throw new P2016Exception("Root folder is missing ");
+        }
+
+        if (rootFiles.size() > 1) {
+            throw new P2016Exception("Root folder should be one ");
+        }
+
+        AbstractFile rootFolder = rootFiles.get(0);
+        return (FolderDTO) beanTransformer.transformEntityToDTO(rootFolder);
     }
 
     @Override
-    public List<AbstractFileDTO> getChildren(long folderID) {
-        return null;
+    public List<AbstractFileDTO> getChildren(long folderID, int start, int end) {
+        UserDTO currentUser = userService.getCurrentUser();
+
+        List<AbstractFile> children = fileDAO.getChildren(currentUser.getId(), folderID, start, end);
+        List<AbstractFileDTO> result = new ArrayList<>(children.size());
+        children.stream().map(abstractFile -> result.add((AbstractFileDTO) beanTransformer.transformEntityToDTO(abstractFile)));
+
+        return result;
     }
 
     @Override
@@ -96,5 +129,13 @@ public class FileServiceImpl implements FileService {
 
     public void setBeanTransformer(BeanTransformer beanTransformer) {
         this.beanTransformer = beanTransformer;
+    }
+
+    public UserServiceImpl getUserService() {
+        return userService;
+    }
+
+    public void setUserService(UserServiceImpl userService) {
+        this.userService = userService;
     }
 }

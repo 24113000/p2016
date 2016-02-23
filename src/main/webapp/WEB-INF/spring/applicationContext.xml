@@ -24,10 +24,13 @@
     <bean name="fileService" class="org.sbezgin.p2016.services.file.impl.FileServiceImpl">
         <property name="fileDAO" ref="fileDAO" />
         <property name="beanTransformer" ref="beanTransformer"/>
+        <property name="userService" ref="userService" />
     </bean>
 
     <!-- dao -->
     <bean name="fileDAO" class="org.sbezgin.p2016.db.dao.impl.FileDAOImpl">
         <property name="sessionFactory" ref="sessionFactory"/>
     </bean>
+
+    <bean id="userService" class="org.sbezgin.p2016.services.impl.UserServiceImpl"/>
 </beans>

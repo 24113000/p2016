@@ -19,9 +19,9 @@ public interface FileService {
 
     void deleteFile(long fileID, boolean recursively);
 
-    List<AbstractFileDTO> getRootFiles();
+    FolderDTO getRootFolder();
 
-    List<AbstractFileDTO> getChildren(long folderID);
+    List<AbstractFileDTO> getChildren(long folderID, int start, int end);
 
     List<AbstractFileDTO> getFilesByType(String javaType);
 }

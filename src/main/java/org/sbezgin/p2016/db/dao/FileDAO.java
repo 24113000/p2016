@@ -1,28 +1,25 @@
 package org.sbezgin.p2016.db.dao;
 
 
-import org.sbezgin.p2016.db.entity.User;
 import org.sbezgin.p2016.db.entity.file.AbstractFile;
 import org.sbezgin.p2016.db.entity.file.Folder;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-@Transactional
 public interface FileDAO {
-    AbstractFile getFileByID(User user, long fileID);
+    AbstractFile getFileByID(int userID, long fileID);
 
-    Folder getFolder(User user, long folderID);
+    Folder getFolder(int userID, long folderID);
 
-    void saveOrUpdateFile(User user, AbstractFile file);
+    void saveOrUpdateFile(int userID, AbstractFile file);
 
-    void saveOrUpdateFiles(User user, List<AbstractFile> files);
+    void saveOrUpdateFiles(int userID, List<AbstractFile> files);
 
-    void deleteFile(User user, long fileID, boolean recursively);
+    void deleteFile(int userID, long fileID, boolean recursively);
 
-    List<AbstractFile> getRootFiles(User user);
+    List<AbstractFile> getRootFiles(int ownerID);
 
-    List<AbstractFile> getChildren(User user, long folderID);
+    List<AbstractFile> getChildren(int userID, long folderID, int start, int end);
 
-    List<AbstractFile> getFilesByType(User user, String javaType);
+    List<AbstractFile> getFilesByType(int userID, String javaType);
 }

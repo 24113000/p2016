@@ -3,9 +3,7 @@ package org.sbezgin.p2016.db.dao.impl;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
 import org.sbezgin.p2016.db.dao.FileDAO;
-import org.sbezgin.p2016.db.entity.User;
 import org.sbezgin.p2016.db.entity.file.AbstractFile;
 import org.sbezgin.p2016.db.entity.file.Folder;
 import org.springframework.transaction.annotation.Propagation;
@@ -18,50 +16,51 @@ public class FileDAOImpl implements FileDAO {
     private SessionFactory sessionFactory;
 
     @Override
-    public AbstractFile getFileByID(User user, long fileID) {
+    public AbstractFile getFileByID(int userID, long fileID) {
         return null;
     }
 
     @Override
-    public Folder getFolder(User user, long folderID) {
+    public Folder getFolder(int userID, long folderID) {
         return null;
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
     @Override
-    public void saveOrUpdateFile(User user, AbstractFile file) {
+    public void saveOrUpdateFile(int userID, AbstractFile file) {
         Session session = getSession();
-        file.setClassName(file.getClass().getCanonicalName());
-        file.setOwnerID(user.getId());
         session.save(file);
     }
 
     @Override
-    public void saveOrUpdateFiles(User user, List<AbstractFile> files) {
+    public void saveOrUpdateFiles(int userID, List<AbstractFile> files) {
 
     }
 
     @Override
-    public void deleteFile(User user, long fileID, boolean recursively) {
+    public void deleteFile(int userID, long fileID, boolean recursively) {
 
     }
 
     @Override
-    public List<AbstractFile> getRootFiles(User user) {
+    public List<AbstractFile> getRootFiles(int ownerID) {
         Session session = getSession();
         Query query = session.createQuery("from AbstractFile as file where file.ownerID = :ownerId and file.parentId is null ");
-        query.setParameter("ownerId", user.getId());
-        List list = query.list();
-        return list;
+        query.setParameter("ownerId", ownerID);
+        return query.list();
     }
 
     @Override
-    public List<AbstractFile> getChildren(User user, long folderID) {
-        return null;
+    public List<AbstractFile> getChildren(int userID, long folderID, int start, int end) {
+        Session session = getSession();
+        Query query = session.createQuery("from AbstractFile as file where file.ownerID = :ownerId and file.parentId = :folderID ");
+        query.setParameter("ownerId", userID);
+        query.setParameter("folderID", folderID);
+        return query.list();
     }
 
     @Override
-    public List<AbstractFile> getFilesByType(User user, String javaType) {
+    public List<AbstractFile> getFilesByType(int userID, String javaType) {
         return null;
     }
 

@@ -16,6 +16,7 @@
         <property name="beanMap">
             <map>
                 <entry key="org.sbezgin.p2016.db.dto.file.FolderDTO" value="org.sbezgin.p2016.db.entity.file.Folder"/>
+                <entry key="org.sbezgin.p2016.db.dto.file.TextFileDTO" value="org.sbezgin.p2016.db.entity.file.TextFile"/>
             </map>
         </property>
     </bean>

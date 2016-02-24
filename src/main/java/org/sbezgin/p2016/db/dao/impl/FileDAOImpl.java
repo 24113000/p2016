@@ -17,7 +17,11 @@ public class FileDAOImpl implements FileDAO {
 
     @Override
     public AbstractFile getFileByID(int userID, long fileID) {
-        return null;
+        Session session = getSession();
+        Query query = session.createQuery("from AbstractFile as file where file.ownerID = :ownerId and file.id = :fileId  ");
+        query.setParameter("ownerId", userID);
+        query.setParameter("fileId", fileID);
+        return (AbstractFile) query.uniqueResult();
     }
 
     @Override

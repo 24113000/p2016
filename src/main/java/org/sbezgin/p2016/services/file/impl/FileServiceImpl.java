@@ -6,7 +6,6 @@ import org.sbezgin.p2016.db.dto.PermissionDTO;
 import org.sbezgin.p2016.db.dto.UserDTO;
 import org.sbezgin.p2016.db.dto.file.AbstractFileDTO;
 import org.sbezgin.p2016.db.dto.file.FolderDTO;
-import org.sbezgin.p2016.db.entity.User;
 import org.sbezgin.p2016.db.entity.file.AbstractFile;
 import org.sbezgin.p2016.services.BeanTransformer;
 import org.sbezgin.p2016.services.file.FileService;
@@ -55,8 +54,16 @@ public class FileServiceImpl implements FileService {
                 if (parent == null) {
                     throw new P2016Exception("Cannot get parent folder by ID " + parentId + " and user ID " + userID);
                 }
-                String newPathId = parent.getIdPath() + "/" + parentId;
-                String newPath = parent.getPath() + "/" + parent.getName();
+
+                String newPathId;
+                String newPath;
+                if (parent.getParentId() == null) {
+                    newPathId = parent.getIdPath() + parentId;
+                    newPath = parent.getPath() + parent.getName();
+                } else {
+                    newPathId = parent.getIdPath() + "/" + parentId;
+                    newPath = parent.getPath() + "/" + parent.getName();
+                }
 
                 fileEntity.setIdPath(newPathId);
                 fileEntity.setPath(newPath);
@@ -104,7 +111,10 @@ public class FileServiceImpl implements FileService {
 
         List<AbstractFile> children = fileDAO.getChildren(currentUser.getId(), folderID, start, end);
         List<AbstractFileDTO> result = new ArrayList<>(children.size());
-        children.stream().map(abstractFile -> result.add((AbstractFileDTO) beanTransformer.transformEntityToDTO(abstractFile)));
+
+        result.addAll(
+                children.stream().map(child -> (AbstractFileDTO) beanTransformer.transformEntityToDTO(child)).collect(Collectors.toList())
+        );
 
         return result;
     }

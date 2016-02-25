@@ -8,7 +8,7 @@ import org.sbezgin.p2016.services.BeanTransformer;
 
 import java.util.Map;
 
-public class BeanTransformerImpl implements BeanTransformer {
+public class BeanTransformerImpl implements BeanTransformer<Object, Object> {
 
     private DozerBeanMapper dozerBeanMapper;
 
@@ -40,7 +40,7 @@ public class BeanTransformerImpl implements BeanTransformer {
     }
 
     @Override
-    public void copyFields(Object src, Object dest) {
+    public void copyFieldsToEntity(Object src, Object dest) {
         dozerBeanMapper.map(src, dest);
     }
 

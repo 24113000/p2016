@@ -33,7 +33,7 @@ public class FileServiceImplTest {
 
     @Test
     @Transactional
-    public void testfileOperation() {
+    public void testFileOperation() {
         testSaveFolder();
 
         testSaveChildren();

@@ -1,10 +1,10 @@
 package org.sbezgin.p2016.services;
 
-public interface BeanTransformer {
+public interface BeanTransformer<D, E> {
 
-    Object transformEntityToDTO(Object obj);
+    D transformEntityToDTO(E obj);
 
-    Object transformDTOToEntity(Object obj);
+    E transformDTOToEntity(D obj);
 
-    void copyFields(Object src, Object dest);
+    void copyFieldsToEntity(D src, E dest);
 }

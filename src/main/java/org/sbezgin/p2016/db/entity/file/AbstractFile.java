@@ -22,6 +22,7 @@ public abstract class AbstractFile {
     private Long parentId;
     private String className;
     private Integer ownerID;
+    private FileContent fileContent;
 
     @Id
     @GeneratedValue(strategy = GenerationType.TABLE, generator="FILE_GEN")
@@ -85,6 +86,14 @@ public abstract class AbstractFile {
 
     public void setOwnerID(Integer ownerID) {
         this.ownerID = ownerID;
+    }
+
+    public FileContent getFileContent() {
+        return fileContent;
+    }
+
+    public void setFileContent(FileContent fileContent) {
+        this.fileContent = fileContent;
     }
 
     @Override

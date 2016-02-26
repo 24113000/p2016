@@ -9,9 +9,20 @@
                             http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.0.xsd
                             http://www.springframework.org/schema/tx  http://www.springframework.org/schema/tx/spring-tx-4.0.xsd">
 
+    <!--File Transformers-->
     <bean name="dozer" class="org.dozer.DozerBeanMapper" />
 
-    <bean name="beanTransformer" class="org.sbezgin.p2016.services.impl.BeanTransformerImpl">
+    <bean name="transformerHolder" class="org.sbezgin.p2016.services.impl.BeanTransformerHolderImpl">
+        <property name="generalTransformer" ref="generalBeanTransformer"/>
+        <property name="mappedTransformers">
+            <map>
+                <entry key="org.sbezgin.p2016.db.entity.file.TextFile" value-ref="textFileTransformer"/>
+                <entry key="org.sbezgin.p2016.db.dto.file.TextFileDTO" value-ref="textFileTransformer"/>
+            </map>
+        </property>
+    </bean>
+
+    <bean name="generalBeanTransformer" class="org.sbezgin.p2016.services.impl.GeneralBeanTransformerImpl">
         <property name="dozerBeanMapper" ref="dozer"/>
         <property name="beanMap">
             <map>
@@ -21,11 +32,13 @@
         </property>
     </bean>
 
+    <bean name="textFileTransformer" class="org.sbezgin.p2016.services.impl.TextFileTransformerImpl" />
+
     <!-- services -->
     <bean name="fileService" class="org.sbezgin.p2016.services.file.impl.FileServiceImpl">
         <property name="fileDAO" ref="fileDAO" />
-        <property name="beanTransformer" ref="beanTransformer"/>
         <property name="userService" ref="userService" />
+        <property name="beanTransformerHolder" ref="transformerHolder"/>
     </bean>
 
     <!-- dao -->

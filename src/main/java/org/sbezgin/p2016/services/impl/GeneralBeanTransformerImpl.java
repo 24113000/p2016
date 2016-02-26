@@ -8,7 +8,7 @@ import org.sbezgin.p2016.services.BeanTransformer;
 
 import java.util.Map;
 
-public class BeanTransformerImpl implements BeanTransformer<Object, Object> {
+public class GeneralBeanTransformerImpl implements BeanTransformer<Object, Object> {
 
     private DozerBeanMapper dozerBeanMapper;
 

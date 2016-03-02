@@ -35,8 +35,29 @@ public class FileServiceImplTest {
     @Transactional
     public void testFileOperation() {
         testSaveFolder();
-
         testSaveChildren();
+        testUpdateFiles();
+    }
+
+    private void testUpdateFiles() {
+        AbstractFileDTO abstractFile = fileService.getFileByName("/ROOT", "Test File 4 With Content");
+        TextFileDTO file = fileService.getFullTextFile(abstractFile.getId());
+
+        assertNotNull(file);
+
+        TextFileContentDTO fileContent = file.getFileContent();
+        fileContent.setData("Test String 123 -- 2");
+
+        fileService.saveFile(file);
+
+        TestTransaction.flagForCommit();
+        TestTransaction.end();
+        TestTransaction.start();
+
+        TextFileDTO savedFile = fileService.getFullTextFile(abstractFile.getId());
+        TextFileContentDTO savedFileContent = savedFile.getFileContent();
+        assertNotNull(savedFileContent);
+        assertEquals("Test String 123 -- 2", savedFileContent.getData());
     }
 
     private void testSaveFolder() {
@@ -118,7 +139,7 @@ public class FileServiceImplTest {
         TestTransaction.end();
         TestTransaction.start();
 
-        savedFile = fileService.getFullFile(savedFile.getId());
+        savedFile = fileService.getFullTextFile(savedFile.getId());
 
         TextFileContentDTO savedFileContent = savedFile.getFileContent();
 

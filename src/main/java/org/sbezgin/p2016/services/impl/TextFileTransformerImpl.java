@@ -56,7 +56,7 @@ public class TextFileTransformerImpl implements BeanTransformer<TextFileDTO, Tex
         dest.setIdPath(src.getIdPath());
 
         TextFileContentDTO textFileContentDTO = src.getFileContent();
-        if (textFileContentDTO != null) {
+        if (textFileContentDTO != null && dest.getFileContent() == null) {
             FileContent textFileContent = new FileContent();
             textFileContent.setId(textFileContentDTO.getId());
             textFileContent.setFile(dest);
@@ -68,6 +68,12 @@ public class TextFileTransformerImpl implements BeanTransformer<TextFileDTO, Tex
 
             textFileContent.setFile(dest);
             dest.setFileContent(textFileContent);
+        } else if (textFileContentDTO != null && dest.getFileContent() != null) {
+            FileContent destFileContent = dest.getFileContent();
+            String data = textFileContentDTO.getData();
+            if (data != null) {
+                destFileContent.setData(data.getBytes(Charset.defaultCharset()));
+            }
         }
     }
 }

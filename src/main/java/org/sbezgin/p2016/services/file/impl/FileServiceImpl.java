@@ -11,6 +11,8 @@ import org.sbezgin.p2016.db.entity.file.AbstractFile;
 import org.sbezgin.p2016.db.entity.file.TextFile;
 import org.sbezgin.p2016.services.BeanTransformer;
 import org.sbezgin.p2016.services.BeanTransformerHolder;
+import org.sbezgin.p2016.services.file.FileNotFoundException;
+import org.sbezgin.p2016.services.file.FileOperationException;
 import org.sbezgin.p2016.services.file.FileService;
 import org.sbezgin.p2016.services.impl.TextFileTransformerImpl;
 import org.sbezgin.p2016.services.impl.UserServiceImpl;
@@ -37,17 +39,29 @@ public class FileServiceImpl implements FileService {
         return null;
     }
 
+    @Override
+    public AbstractFileDTO getFileByName(String folderPath, String fileName) {
+        UserDTO currentUser = userService.getCurrentUser();
+        AbstractFile file = fileDAO.getFileByName(currentUser.getId(), folderPath, fileName);
+        if (file != null) {
+            BeanTransformer beanTransformer = getTransformer(file);
+            return (AbstractFileDTO) beanTransformer.transformEntityToDTO(file);
+        }
+        return null;
+    }
+
     @Transactional(propagation = Propagation.REQUIRED)
     @Override
     public void saveFile(AbstractFileDTO file) {
         UserDTO currentUser = userService.getCurrentUser();
         Long id = file.getId();
+        int userID = currentUser.getId();
+
         if (id == null) {
             BeanTransformer beanTransformer = getTransformer(file);
             AbstractFile fileEntity = (AbstractFile) beanTransformer.transformDTOToEntity(file);
 
             fileEntity.setClassName(fileEntity.getClass().getCanonicalName());
-            int userID = currentUser.getId();
             fileEntity.setOwnerID(userID);
 
             Long parentId = fileEntity.getParentId();
@@ -76,6 +90,16 @@ public class FileServiceImpl implements FileService {
             }
 
             fileDAO.saveOrUpdateFile(userID, fileEntity);
+        } else {
+            AbstractFile savedFile = fileDAO.getFileByID(userID, file.getId());
+            if (savedFile == null) {
+                throw new FileNotFoundException("Cannot get file " + file.getName() + " by id " + file.getId());
+            }
+
+            BeanTransformer transformer = getTransformer(savedFile);
+            transformer.copyFieldsToEntity(file, savedFile);
+
+            fileDAO.saveOrUpdateFile(userID, savedFile);
         }
     }
 
@@ -140,7 +164,7 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    public TextFileDTO getFullFile(long fileID) {
+    public TextFileDTO getFullTextFile(long fileID) {
         UserDTO currentUser = userService.getCurrentUser();
         AbstractFile textFile = fileDAO.getFileByID(currentUser.getId(), fileID);
         TextFileTransformerImpl transformer = (TextFileTransformerImpl) beanTransformerHolder.getTransformer(textFile.getClassName());

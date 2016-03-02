@@ -25,6 +25,16 @@ public class FileDAOImpl implements FileDAO {
     }
 
     @Override
+    public AbstractFile getFileByName(int userID, String folderPath, String fileName) {
+        Session session = getSession();
+        Query query = session.createQuery("from AbstractFile as file where file.ownerID = :ownerId and file.name = :fileName and file.path = :folderPath  ");
+        query.setParameter("ownerId", userID);
+        query.setParameter("fileName", fileName);
+        query.setParameter("folderPath", folderPath);
+        return (AbstractFile) query.uniqueResult();
+    }
+
+    @Override
     public Folder getFolder(int userID, long folderID) {
         return null;
     }

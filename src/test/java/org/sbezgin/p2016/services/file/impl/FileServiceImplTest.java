@@ -5,7 +5,9 @@ import org.junit.runner.RunWith;
 import org.sbezgin.p2016.common.FileType;
 import org.sbezgin.p2016.db.dto.file.AbstractFileDTO;
 import org.sbezgin.p2016.db.dto.file.FolderDTO;
+import org.sbezgin.p2016.db.dto.file.TextFileContentDTO;
 import org.sbezgin.p2016.db.dto.file.TextFileDTO;
+import org.sbezgin.p2016.db.entity.file.FileContent;
 import org.sbezgin.p2016.services.file.FileService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
@@ -19,6 +21,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -77,22 +80,51 @@ public class FileServiceImplTest {
         textFileDTO3.setType(FileType.JSON);
         textFileDTO3.setParentId(rootFolder.getId());
 
+        TextFileDTO textFileDTO4 = new TextFileDTO();
+        textFileDTO4.setName("Test File 4 With Content");
+        textFileDTO4.setType(FileType.JSON);
+        textFileDTO4.setParentId(rootFolder.getId());
+
+        TextFileContentDTO fileContent = new TextFileContentDTO();
+        fileContent.setData("Test String 123");
+        textFileDTO4.setFileContent(fileContent);
+
         fileService.saveFile(textFileDTO1);
         fileService.saveFile(textFileDTO2);
         fileService.saveFile(textFileDTO3);
+        fileService.saveFile(textFileDTO4);
 
         TestTransaction.flagForCommit();
         TestTransaction.end();
         TestTransaction.start();
 
         List<AbstractFileDTO> savedChildren = fileService.getChildren(rootFolder.getId(), 0, 50);
-        assertEquals(3, savedChildren.size());
+        assertEquals(4, savedChildren.size());
 
         Set<String> names = savedChildren.stream().map(AbstractFileDTO::getName).collect(Collectors.toSet());
 
         assertTrue("Failed checking name: " + textFileDTO1.getName(), names.contains(textFileDTO1.getName()));
         assertTrue("Failed checking name: " + textFileDTO2.getName(), names.contains(textFileDTO2.getName()));
         assertTrue("Failed checking name: " + textFileDTO3.getName(), names.contains(textFileDTO3.getName()));
+        assertTrue("Failed checking name: " + textFileDTO4.getName(), names.contains(textFileDTO4.getName()));
 
+        TextFileDTO savedFile = null;
+        for (AbstractFileDTO savedChild : savedChildren) {
+            if (savedChild.getName().equals("Test File 4 With Content")) {
+                savedFile = (TextFileDTO) savedChild;
+            }
+        }
+
+        assertNotNull(savedFile);
+
+        TestTransaction.flagForCommit();
+        TestTransaction.end();
+        TestTransaction.start();
+
+        savedFile = fileService.getFullFile(savedFile.getId());
+
+        TextFileContentDTO savedFileContent = savedFile.getFileContent();
+
+        assertEquals("Test String 123", savedFileContent.getData());
     }
 }

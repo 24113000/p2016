@@ -22,12 +22,4 @@ public class TextFileDTO extends AbstractFileDTO {
     public TextFileContentDTO getFileContent() {
         return fileContent;
     }
-
-    public boolean isHasFileContent() {
-        return hasFileContent;
-    }
-
-    public void setHasFileContent(boolean hasFileContent) {
-        this.hasFileContent = hasFileContent;
-    }
 }

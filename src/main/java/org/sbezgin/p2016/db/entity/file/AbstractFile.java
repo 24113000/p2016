@@ -88,6 +88,8 @@ public abstract class AbstractFile {
         this.ownerID = ownerID;
     }
 
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "content_id", nullable = true)
     public FileContent getFileContent() {
         return fileContent;
     }

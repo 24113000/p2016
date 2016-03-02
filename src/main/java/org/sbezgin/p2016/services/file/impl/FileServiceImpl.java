@@ -6,10 +6,13 @@ import org.sbezgin.p2016.db.dto.PermissionDTO;
 import org.sbezgin.p2016.db.dto.UserDTO;
 import org.sbezgin.p2016.db.dto.file.AbstractFileDTO;
 import org.sbezgin.p2016.db.dto.file.FolderDTO;
+import org.sbezgin.p2016.db.dto.file.TextFileDTO;
 import org.sbezgin.p2016.db.entity.file.AbstractFile;
+import org.sbezgin.p2016.db.entity.file.TextFile;
 import org.sbezgin.p2016.services.BeanTransformer;
 import org.sbezgin.p2016.services.BeanTransformerHolder;
 import org.sbezgin.p2016.services.file.FileService;
+import org.sbezgin.p2016.services.impl.TextFileTransformerImpl;
 import org.sbezgin.p2016.services.impl.UserServiceImpl;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,7 +46,7 @@ public class FileServiceImpl implements FileService {
             BeanTransformer beanTransformer = getTransformer(file);
             AbstractFile fileEntity = (AbstractFile) beanTransformer.transformDTOToEntity(file);
 
-            fileEntity.setClassName(file.getClass().getCanonicalName());
+            fileEntity.setClassName(fileEntity.getClass().getCanonicalName());
             int userID = currentUser.getId();
             fileEntity.setOwnerID(userID);
 
@@ -136,6 +139,13 @@ public class FileServiceImpl implements FileService {
         return null;
     }
 
+    @Override
+    public TextFileDTO getFullFile(long fileID) {
+        UserDTO currentUser = userService.getCurrentUser();
+        AbstractFile textFile = fileDAO.getFileByID(currentUser.getId(), fileID);
+        TextFileTransformerImpl transformer = (TextFileTransformerImpl) beanTransformerHolder.getTransformer(textFile.getClassName());
+        return transformer.transformEntityToDTO((TextFile) textFile, true);
+    }
 
     public FileDAO getFileDAO() {
         return fileDAO;

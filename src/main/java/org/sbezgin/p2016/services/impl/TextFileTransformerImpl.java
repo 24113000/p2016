@@ -32,7 +32,6 @@ public class TextFileTransformerImpl implements BeanTransformer<TextFileDTO, Tex
             textFileContentDTO.setData(new String(fileContent.getData(), Charset.defaultCharset())); //TODO add default charset to JVM
 
             textFileDTO.setFileContent(textFileContentDTO);
-            textFileDTO.setHasFileContent(true);
         }
 
         return textFileDTO;
@@ -57,16 +56,18 @@ public class TextFileTransformerImpl implements BeanTransformer<TextFileDTO, Tex
         dest.setIdPath(src.getIdPath());
 
         TextFileContentDTO textFileContentDTO = src.getFileContent();
-        FileContent textFileContent = new FileContent();
+        if (textFileContentDTO != null) {
+            FileContent textFileContent = new FileContent();
+            textFileContent.setId(textFileContentDTO.getId());
+            textFileContent.setFile(dest);
 
-        textFileContent.setId(textFileContentDTO.getId());
-        textFileContent.setFile(dest);
+            String data = textFileContentDTO.getData();
+            if (data != null) {
+                textFileContent.setData(data.getBytes(Charset.defaultCharset()));
+            }
 
-        String data = textFileContentDTO.getData();
-        if (data != null) {
-            textFileContent.setData(data.getBytes(Charset.defaultCharset()));
+            textFileContent.setFile(dest);
+            dest.setFileContent(textFileContent);
         }
-
-        dest.setFileContent(textFileContent);
     }
 }

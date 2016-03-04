@@ -8,6 +8,7 @@ import org.sbezgin.p2016.db.dto.file.AbstractFileDTO;
 import org.sbezgin.p2016.db.dto.file.FolderDTO;
 import org.sbezgin.p2016.db.dto.file.TextFileDTO;
 import org.sbezgin.p2016.db.entity.file.AbstractFile;
+import org.sbezgin.p2016.db.entity.file.Folder;
 import org.sbezgin.p2016.db.entity.file.TextFile;
 import org.sbezgin.p2016.services.BeanTransformer;
 import org.sbezgin.p2016.services.BeanTransformerHolder;
@@ -36,18 +37,30 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public FolderDTO getFolder(long folderID) {
+        UserDTO currentUser = userService.getCurrentUser();
+        Folder folder = fileDAO.getFolder(currentUser.getId(), folderID);
+        if (folder != null) {
+            BeanTransformer transformer = beanTransformerHolder.getTransformer(folder.getClass().getCanonicalName());
+            return (FolderDTO) transformer.transformEntityToDTO(folder);
+        }
         return null;
     }
 
     @Override
-    public AbstractFileDTO getFileByName(String folderPath, String fileName) {
+    public List<AbstractFileDTO> getFileByName(String folderPath, String fileName) {
         UserDTO currentUser = userService.getCurrentUser();
-        AbstractFile file = fileDAO.getFileByName(currentUser.getId(), folderPath, fileName);
-        if (file != null) {
-            BeanTransformer beanTransformer = getTransformer(file);
-            return (AbstractFileDTO) beanTransformer.transformEntityToDTO(file);
+        List<AbstractFile> files = fileDAO.getFileByName(currentUser.getId(), folderPath, fileName);
+        if (files != null && files.size() > 0) {
+
+            List<AbstractFileDTO> fileDTOs = new ArrayList<>(files.size());
+            for (AbstractFile file : files) {
+                BeanTransformer beanTransformer = getTransformer(file);
+                fileDTOs.add((AbstractFileDTO) beanTransformer.transformEntityToDTO(file));
+            }
+
+            return fileDTOs;
         }
-        return null;
+        return new ArrayList<>();
     }
 
     @Transactional(propagation = Propagation.REQUIRED)

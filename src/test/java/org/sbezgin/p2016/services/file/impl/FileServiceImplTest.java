@@ -37,11 +37,37 @@ public class FileServiceImplTest {
         testSaveFolder();
         testSaveChildren();
         testUpdateFiles();
+        testGetFolderByID();
+    }
+
+    private void testGetFolderByID() {
+        FolderDTO rootFolder = fileService.getRootFolder();
+
+        FolderDTO someFolder = new FolderDTO();
+        someFolder.setName("Test Folder");
+        someFolder.setParentId(null);
+        someFolder.setIdPath("/");
+        someFolder.setPath("/");
+        someFolder.setParentId(rootFolder.getId());
+
+        fileService.saveFile(someFolder);
+
+        TestTransaction.flagForCommit();
+        TestTransaction.end();
+        TestTransaction.start();
+
+        List<AbstractFileDTO> files = fileService.getFileByName("/ROOT", "Test Folder");
+        assertEquals(1, files.size());
+
+        FolderDTO folder = fileService.getFolder(files.get(0).getId());
+        assertNotNull(folder);
     }
 
     private void testUpdateFiles() {
-        AbstractFileDTO abstractFile = fileService.getFileByName("/ROOT", "Test File 4 With Content");
-        TextFileDTO file = fileService.getFullTextFile(abstractFile.getId());
+        List<AbstractFileDTO> abstractFile = fileService.getFileByName("/ROOT", "Test File 4 With Content");
+        assertEquals(1, abstractFile.size());
+        Long fileID = abstractFile.get(0).getId();
+        TextFileDTO file = fileService.getFullTextFile(fileID);
 
         assertNotNull(file);
 
@@ -54,7 +80,7 @@ public class FileServiceImplTest {
         TestTransaction.end();
         TestTransaction.start();
 
-        TextFileDTO savedFile = fileService.getFullTextFile(abstractFile.getId());
+        TextFileDTO savedFile = fileService.getFullTextFile(fileID);
         TextFileContentDTO savedFileContent = savedFile.getFileContent();
         assertNotNull(savedFileContent);
         assertEquals("Test String 123 -- 2", savedFileContent.getData());

@@ -9,7 +9,7 @@ import java.util.List;
 public interface FileDAO {
     AbstractFile getFileByID(int userID, long fileID);
 
-    AbstractFile getFileByName(int userID, String folderPath, String fileName);
+    List<AbstractFile> getFileByName(int userID, String folderPath, String fileName);
 
     Folder getFolder(int userID, long folderID);
 

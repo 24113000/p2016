@@ -12,7 +12,7 @@ public interface FileService {
 
     FolderDTO getFolder(long folderID);
 
-    AbstractFileDTO getFileByName(String folderPath, String fileName);
+    List<AbstractFileDTO> getFileByName(String folderPath, String fileName);
 
     void saveFile(AbstractFileDTO file);
 

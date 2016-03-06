@@ -39,6 +39,23 @@ public class FileServiceImplTest {
         testUpdateFiles();
         testGetFolderByID();
         testDeleteCascade();
+        testRenameFolder();
+    }
+
+    private void testRenameFolder() {
+        List<AbstractFileDTO> files = fileService.getFilesByName("/ROOT", "Test Folder");
+        assertEquals(1, files.size());
+        FolderDTO testFolder2 = (FolderDTO) files.get(0);
+        testFolder2.setName("Test Folder 2222");
+
+        fileService.saveFile(testFolder2);
+
+        TestTransaction.flagForCommit();
+        TestTransaction.end();
+        TestTransaction.start();
+
+        files = fileService.getFilesByName("/ROOT", "Test Folder 2222");
+        assertEquals(1, files.size());
     }
 
     private void testDeleteCascade() {

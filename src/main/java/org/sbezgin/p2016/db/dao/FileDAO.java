@@ -9,7 +9,9 @@ import java.util.List;
 public interface FileDAO {
     AbstractFile getFileByID(int userID, long fileID);
 
-    List<AbstractFile> getFileByName(int userID, String folderPath, String fileName);
+    List<AbstractFile> getFileByIDs(int userID, List<Long> fileIDs);
+
+    List<AbstractFile> getFilesByName(int userID, String folderPath, String fileName);
 
     Folder getFolder(int userID, long folderID);
 
@@ -17,11 +19,13 @@ public interface FileDAO {
 
     void saveOrUpdateFiles(int userID, List<AbstractFile> files);
 
-    void deleteFile(int userID, long fileID, boolean recursively);
+    void deleteFile(int userID, long fileID);
 
     List<AbstractFile> getRootFiles(int ownerID);
 
     List<AbstractFile> getChildren(int userID, long folderID, int start, int end);
 
-    List<AbstractFile> getFilesByType(int userID, String javaType);
+    List<AbstractFile> getFilesByIDs(int userID, List<Long> idList);
+
+    List<AbstractFile> getAllChildren(int currentUserId, long fileID);
 }

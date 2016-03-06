@@ -38,6 +38,98 @@ public class FileServiceImplTest {
         testSaveChildren();
         testUpdateFiles();
         testGetFolderByID();
+        testDeleteCascade();
+    }
+
+    private void testDeleteCascade() {
+        //create folders
+        List<AbstractFileDTO> files = fileService.getFilesByName("/ROOT", "Test Folder");
+        assertEquals(1, files.size());
+
+        AbstractFileDTO testFolder1 = files.get(0);
+        FolderDTO testFolder2 = new FolderDTO();
+        testFolder2.setName("Test Folder 2");
+        testFolder2.setParentId(null);
+        testFolder2.setParentId(testFolder1.getId());
+        fileService.saveFile(testFolder2);
+
+        TestTransaction.flagForCommit();
+        TestTransaction.end();
+        TestTransaction.start();
+
+        files = fileService.getFilesByName("/ROOT/Test Folder", "Test Folder 2");
+        assertEquals(1, files.size());
+        testFolder2 = (FolderDTO) files.get(0);
+        FolderDTO testFolder3 = new FolderDTO();
+        testFolder3.setName("Test Folder 3");
+        testFolder3.setParentId(null);
+        testFolder3.setParentId(testFolder2.getId());
+
+        fileService.saveFile(testFolder3);
+
+        TestTransaction.flagForCommit();
+        TestTransaction.end();
+        TestTransaction.start();
+
+        files = fileService.getFilesByName("/ROOT/Test Folder/Test Folder 2", "Test Folder 3");
+        assertEquals(1, files.size());
+        testFolder3 = (FolderDTO) files.get(0);
+        FolderDTO testFolder4 = new FolderDTO();
+        testFolder4.setName("Test Folder 4");
+        testFolder4.setParentId(null);
+        testFolder4.setParentId(testFolder3.getId());
+
+        fileService.saveFile(testFolder4);
+
+        TestTransaction.flagForCommit();
+        TestTransaction.end();
+        TestTransaction.start();
+
+        files = fileService.getFilesByName("/ROOT/Test Folder/Test Folder 2/Test Folder 3", "Test Folder 4");
+        assertEquals(1, files.size());
+        testFolder4 = (FolderDTO) files.get(0);
+        FolderDTO testFolder5 = new FolderDTO();
+        testFolder5.setName("Test Folder 5");
+        testFolder5.setParentId(null);
+        testFolder5.setParentId(testFolder4.getId());
+
+        fileService.saveFile(testFolder5);
+
+        TestTransaction.flagForCommit();
+        TestTransaction.end();
+        TestTransaction.start();
+
+        //deleting file
+        files = fileService.getFilesByName("/ROOT/Test Folder/Test Folder 2/Test Folder 3/Test Folder 4", "Test Folder 5");
+        assertEquals(1, files.size());
+
+        testFolder5 = (FolderDTO) files.get(0);
+
+        fileService.deleteFile(testFolder5.getId(), false);
+
+        files = fileService.getFilesByName("/ROOT/Test Folder/Test Folder 2/Test Folder 3/Test Folder 4", "Test Folder 5");
+        assertEquals(0, files.size());
+
+        TestTransaction.flagForCommit();
+        TestTransaction.end();
+        TestTransaction.start();
+
+        //cascade deleting files
+        files = fileService.getFilesByName("/ROOT/Test Folder", "Test Folder 2");
+        assertEquals(1, files.size());
+        AbstractFileDTO folder2 = files.get(0);
+
+        fileService.deleteFile(folder2.getId(), true);
+
+        TestTransaction.flagForCommit();
+        TestTransaction.end();
+        TestTransaction.start();
+
+        files = fileService.getFilesByName("/ROOT/Test Folder/Test Folder 2/Test Folder 3", "Test Folder 4");
+        assertEquals(0, files.size());
+
+        files = fileService.getFilesByName("/ROOT/Test Folder/Test Folder 2", "Test Folder 3");
+        assertEquals(0, files.size());
     }
 
     private void testGetFolderByID() {
@@ -46,8 +138,6 @@ public class FileServiceImplTest {
         FolderDTO someFolder = new FolderDTO();
         someFolder.setName("Test Folder");
         someFolder.setParentId(null);
-        someFolder.setIdPath("/");
-        someFolder.setPath("/");
         someFolder.setParentId(rootFolder.getId());
 
         fileService.saveFile(someFolder);
@@ -56,7 +146,7 @@ public class FileServiceImplTest {
         TestTransaction.end();
         TestTransaction.start();
 
-        List<AbstractFileDTO> files = fileService.getFileByName("/ROOT", "Test Folder");
+        List<AbstractFileDTO> files = fileService.getFilesByName("/ROOT", "Test Folder");
         assertEquals(1, files.size());
 
         FolderDTO folder = fileService.getFolder(files.get(0).getId());
@@ -64,7 +154,7 @@ public class FileServiceImplTest {
     }
 
     private void testUpdateFiles() {
-        List<AbstractFileDTO> abstractFile = fileService.getFileByName("/ROOT", "Test File 4 With Content");
+        List<AbstractFileDTO> abstractFile = fileService.getFilesByName("/ROOT", "Test File 4 With Content");
         assertEquals(1, abstractFile.size());
         Long fileID = abstractFile.get(0).getId();
         TextFileDTO file = fileService.getFullTextFile(fileID);

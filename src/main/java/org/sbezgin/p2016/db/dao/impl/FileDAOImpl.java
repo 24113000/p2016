@@ -25,7 +25,14 @@ public class FileDAOImpl implements FileDAO {
     }
 
     @Override
-    public List<AbstractFile> getFileByName(int userID, String folderPath, String fileName) {
+    public List<AbstractFile> getFileByIDs(int userID, List<Long> fileIDs) {
+        Session session = getSession();
+        Query query = session.createQuery("from AbstractFile as file where file.ownerID = :ownerId and file.id = :fileId  ");
+        return query.list();
+    }
+
+    @Override
+    public List<AbstractFile> getFilesByName(int userID, String folderPath, String fileName) {
         Session session = getSession();
         Query query = session.createQuery("from AbstractFile as file where file.ownerID = :ownerId and file.name = :fileName and file.path = :folderPath  ");
         query.setParameter("ownerId", userID);
@@ -56,8 +63,12 @@ public class FileDAOImpl implements FileDAO {
     }
 
     @Override
-    public void deleteFile(int userID, long fileID, boolean recursively) {
-
+    public void deleteFile(int userID, long fileID) {
+        Session session = getSession();
+        Query query = session.createQuery("delete from AbstractFile as file where file.ownerID = :ownerId and file.id = :fileId ");
+        query.setParameter("ownerId", userID);
+        query.setParameter("fileId", fileID);
+        query.executeUpdate();
     }
 
     @Override
@@ -78,8 +89,22 @@ public class FileDAOImpl implements FileDAO {
     }
 
     @Override
-    public List<AbstractFile> getFilesByType(int userID, String javaType) {
-        return null;
+    public List<AbstractFile> getFilesByIDs(int userID, List<Long> idList) {
+        Session session = getSession();
+        Query query = session.createQuery("from AbstractFile as file where file.ownerID = :ownerId and file.id in :fileIds");
+        query.setParameter("ownerId", userID);
+        query.setParameterList("fileIds", idList);
+        return query.list();
+    }
+
+    @Override
+    public List<AbstractFile> getAllChildren(int userId, long fileID) {
+        Session session = getSession();
+        Query query = session.createQuery("from AbstractFile as file where file.ownerID = :ownerId and (file.idPath like :likeexp or file.idPath like :likeexp2) ");
+        query.setParameter("ownerId", userId);
+        query.setParameter("likeexp", "%/" + fileID + "/%");
+        query.setParameter("likeexp2", "%/" + fileID);
+        return query.list();
     }
 
     private Session getSession() {

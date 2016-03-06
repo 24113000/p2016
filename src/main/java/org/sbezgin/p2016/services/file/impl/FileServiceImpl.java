@@ -13,14 +13,15 @@ import org.sbezgin.p2016.db.entity.file.TextFile;
 import org.sbezgin.p2016.services.BeanTransformer;
 import org.sbezgin.p2016.services.BeanTransformerHolder;
 import org.sbezgin.p2016.services.file.FileNotFoundException;
-import org.sbezgin.p2016.services.file.FileOperationException;
 import org.sbezgin.p2016.services.file.FileService;
+import org.sbezgin.p2016.services.file.FolderIsNotEmpty;
 import org.sbezgin.p2016.services.impl.TextFileTransformerImpl;
 import org.sbezgin.p2016.services.impl.UserServiceImpl;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -47,9 +48,9 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    public List<AbstractFileDTO> getFileByName(String folderPath, String fileName) {
+    public List<AbstractFileDTO> getFilesByName(String folderPath, String fileName) {
         UserDTO currentUser = userService.getCurrentUser();
-        List<AbstractFile> files = fileDAO.getFileByName(currentUser.getId(), folderPath, fileName);
+        List<AbstractFile> files = fileDAO.getFilesByName(currentUser.getId(), folderPath, fileName);
         if (files != null && files.size() > 0) {
 
             List<AbstractFileDTO> fileDTOs = new ArrayList<>(files.size());
@@ -128,7 +129,32 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public void deleteFile(long fileID, boolean recursively) {
+        UserDTO currentUser = userService.getCurrentUser();
+        if (recursively) {
+            List<AbstractFile> children = fileDAO.getAllChildren(currentUser.getId(), fileID);
+            children.sort((o1, o2) -> {
+                        if (o1.getIdPath().split("/").length < o2.getIdPath().split("/").length) {
+                            return 1;
+                        } else if (o1.getIdPath().split("/").length > o2.getIdPath().split("/").length) {
+                            return -1;
+                        } else {
+                            return 0;
+                        }
+                    }
+            );
+            for (AbstractFile child : children) {
+                fileDAO.deleteFile(currentUser.getId(), child.getId());
+            }
 
+            fileDAO.deleteFile(currentUser.getId(), fileID);
+        } else {
+            List<AbstractFile> children = fileDAO.getAllChildren(currentUser.getId(), fileID);
+            if (children.size() != 0) {
+                throw new FolderIsNotEmpty("Folder is not empty");
+            }
+
+            fileDAO.deleteFile(currentUser.getId(), fileID);
+        }
     }
 
     @Override

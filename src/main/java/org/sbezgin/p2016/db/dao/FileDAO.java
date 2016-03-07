@@ -19,7 +19,7 @@ public interface FileDAO {
 
     void saveOrUpdateFiles(int userID, List<AbstractFile> files);
 
-    void deleteFile(int userID, long fileID);
+    int deleteFile(int userID, long fileID);
 
     List<AbstractFile> getRootFiles(int ownerID);
 

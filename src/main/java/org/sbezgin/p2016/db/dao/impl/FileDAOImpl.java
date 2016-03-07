@@ -44,7 +44,7 @@ public class FileDAOImpl implements FileDAO {
     @Override
     public Folder getFolder(int userID, long folderID) {
         AbstractFile fileByID = getFileByID(userID, folderID);
-        if (fileByID.getClassName().equals(Folder.class.getCanonicalName())) {
+        if (fileByID != null && fileByID.getClassName().equals(Folder.class.getCanonicalName())) {
             return (Folder) fileByID;
         }
         return null;
@@ -63,12 +63,12 @@ public class FileDAOImpl implements FileDAO {
     }
 
     @Override
-    public void deleteFile(int userID, long fileID) {
+    public int deleteFile(int userID, long fileID) {
         Session session = getSession();
         Query query = session.createQuery("delete from AbstractFile as file where file.ownerID = :ownerId and file.id = :fileId ");
         query.setParameter("ownerId", userID);
         query.setParameter("fileId", fileID);
-        query.executeUpdate();
+        return query.executeUpdate();
     }
 
     @Override

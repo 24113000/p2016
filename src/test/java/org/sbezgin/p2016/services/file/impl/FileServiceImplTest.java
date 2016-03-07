@@ -9,10 +9,10 @@ import org.sbezgin.p2016.db.dto.file.TextFileContentDTO;
 import org.sbezgin.p2016.db.dto.file.TextFileDTO;
 import org.sbezgin.p2016.services.file.FileService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.ContextHierarchy;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.transaction.TestTransaction;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -20,12 +20,14 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.junit.Assert.*;
+import static org.util.TestUtil.commitAndStartTransaction;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextHierarchy({
         @ContextConfiguration(value = "file:src/main/webapp/WEB-INF/spring/applicationContext-db.xml"),
         @ContextConfiguration(value = "file:src/main/webapp/WEB-INF/spring/applicationContext.xml")
 })
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
 public class FileServiceImplTest {
 
     @Autowired
@@ -46,13 +48,10 @@ public class FileServiceImplTest {
         List<AbstractFileDTO> files = fileService.getFilesByName("/ROOT", "Test Folder");
         assertEquals(1, files.size());
         FolderDTO testFolder2 = (FolderDTO) files.get(0);
-        testFolder2.setName("Test Folder 2222");
 
-        fileService.saveFile(testFolder2);
+        fileService.renameFile(testFolder2.getId(), "Test Folder 2222");
 
-        TestTransaction.flagForCommit();
-        TestTransaction.end();
-        TestTransaction.start();
+        commitAndStartTransaction();
 
         files = fileService.getFilesByName("/ROOT", "Test Folder 2222");
         assertEquals(1, files.size());
@@ -70,9 +69,7 @@ public class FileServiceImplTest {
         testFolder2.setParentId(testFolder1.getId());
         fileService.saveFile(testFolder2);
 
-        TestTransaction.flagForCommit();
-        TestTransaction.end();
-        TestTransaction.start();
+        commitAndStartTransaction();
 
         files = fileService.getFilesByName("/ROOT/Test Folder", "Test Folder 2");
         assertEquals(1, files.size());
@@ -84,9 +81,7 @@ public class FileServiceImplTest {
 
         fileService.saveFile(testFolder3);
 
-        TestTransaction.flagForCommit();
-        TestTransaction.end();
-        TestTransaction.start();
+        commitAndStartTransaction();
 
         files = fileService.getFilesByName("/ROOT/Test Folder/Test Folder 2", "Test Folder 3");
         assertEquals(1, files.size());
@@ -98,9 +93,7 @@ public class FileServiceImplTest {
 
         fileService.saveFile(testFolder4);
 
-        TestTransaction.flagForCommit();
-        TestTransaction.end();
-        TestTransaction.start();
+        commitAndStartTransaction();
 
         files = fileService.getFilesByName("/ROOT/Test Folder/Test Folder 2/Test Folder 3", "Test Folder 4");
         assertEquals(1, files.size());
@@ -112,9 +105,7 @@ public class FileServiceImplTest {
 
         fileService.saveFile(testFolder5);
 
-        TestTransaction.flagForCommit();
-        TestTransaction.end();
-        TestTransaction.start();
+        commitAndStartTransaction();
 
         //deleting file
         files = fileService.getFilesByName("/ROOT/Test Folder/Test Folder 2/Test Folder 3/Test Folder 4", "Test Folder 5");
@@ -127,9 +118,7 @@ public class FileServiceImplTest {
         files = fileService.getFilesByName("/ROOT/Test Folder/Test Folder 2/Test Folder 3/Test Folder 4", "Test Folder 5");
         assertEquals(0, files.size());
 
-        TestTransaction.flagForCommit();
-        TestTransaction.end();
-        TestTransaction.start();
+        commitAndStartTransaction();
 
         //cascade deleting files
         files = fileService.getFilesByName("/ROOT/Test Folder", "Test Folder 2");
@@ -138,9 +127,7 @@ public class FileServiceImplTest {
 
         fileService.deleteFile(folder2.getId(), true);
 
-        TestTransaction.flagForCommit();
-        TestTransaction.end();
-        TestTransaction.start();
+        commitAndStartTransaction();
 
         files = fileService.getFilesByName("/ROOT/Test Folder/Test Folder 2/Test Folder 3", "Test Folder 4");
         assertEquals(0, files.size());
@@ -159,9 +146,7 @@ public class FileServiceImplTest {
 
         fileService.saveFile(someFolder);
 
-        TestTransaction.flagForCommit();
-        TestTransaction.end();
-        TestTransaction.start();
+        commitAndStartTransaction();
 
         List<AbstractFileDTO> files = fileService.getFilesByName("/ROOT", "Test Folder");
         assertEquals(1, files.size());
@@ -183,9 +168,7 @@ public class FileServiceImplTest {
 
         fileService.saveFile(file);
 
-        TestTransaction.flagForCommit();
-        TestTransaction.end();
-        TestTransaction.start();
+        commitAndStartTransaction();
 
         TextFileDTO savedFile = fileService.getFullTextFile(fileID);
         TextFileContentDTO savedFileContent = savedFile.getFileContent();
@@ -202,9 +185,7 @@ public class FileServiceImplTest {
 
         fileService.saveFile(rootFolder);
 
-        TestTransaction.flagForCommit();
-        TestTransaction.end();
-        TestTransaction.start();
+        commitAndStartTransaction();
 
         FolderDTO savedRootFolder = fileService.getRootFolder();
 
@@ -245,9 +226,7 @@ public class FileServiceImplTest {
         fileService.saveFile(textFileDTO3);
         fileService.saveFile(textFileDTO4);
 
-        TestTransaction.flagForCommit();
-        TestTransaction.end();
-        TestTransaction.start();
+        commitAndStartTransaction();
 
         List<AbstractFileDTO> savedChildren = fileService.getChildren(rootFolder.getId(), 0, 50);
         assertEquals(4, savedChildren.size());
@@ -268,9 +247,7 @@ public class FileServiceImplTest {
 
         assertNotNull(savedFile);
 
-        TestTransaction.flagForCommit();
-        TestTransaction.end();
-        TestTransaction.start();
+        commitAndStartTransaction();
 
         savedFile = fileService.getFullTextFile(savedFile.getId());
 

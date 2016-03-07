@@ -13,6 +13,7 @@ import org.sbezgin.p2016.db.entity.file.TextFile;
 import org.sbezgin.p2016.services.BeanTransformer;
 import org.sbezgin.p2016.services.BeanTransformerHolder;
 import org.sbezgin.p2016.services.file.FileNotFoundException;
+import org.sbezgin.p2016.services.file.FileOperationException;
 import org.sbezgin.p2016.services.file.FileService;
 import org.sbezgin.p2016.services.file.FolderIsNotEmpty;
 import org.sbezgin.p2016.services.impl.TextFileTransformerImpl;
@@ -21,7 +22,6 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -70,6 +70,11 @@ public class FileServiceImpl implements FileService {
         UserDTO currentUser = userService.getCurrentUser();
         Long id = file.getId();
         int userID = currentUser.getId();
+
+        String fileName = file.getName();
+        if (fileName.contains("/") || (fileName.contains("\\\\"))) {
+            throw new FileOperationException("File name cannot contain slash");
+        }
 
         if (id == null) {
             BeanTransformer beanTransformer = getTransformer(file);
@@ -124,12 +129,19 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public void renameFile(long fileID, String newName) {
-
+        UserDTO currentUser = userService.getCurrentUser();
+        AbstractFile file = fileDAO.getFileByID(currentUser.getId(), fileID);
+        if (file == null) {
+            throw new FileNotFoundException("Cannot find file: " + fileID);
+        }
+        file.setName(newName);
+        fileDAO.saveOrUpdateFile(currentUser.getId(), file);
     }
 
     @Override
     public void deleteFile(long fileID, boolean recursively) {
         UserDTO currentUser = userService.getCurrentUser();
+        int result;
         if (recursively) {
             List<AbstractFile> children = fileDAO.getAllChildren(currentUser.getId(), fileID);
             children.sort((o1, o2) -> {
@@ -143,17 +155,26 @@ public class FileServiceImpl implements FileService {
                     }
             );
             for (AbstractFile child : children) {
-                fileDAO.deleteFile(currentUser.getId(), child.getId());
+                int childResult = fileDAO.deleteFile(currentUser.getId(), child.getId());
+                if (childResult != 1) {
+                    throw new FileNotFoundException("Cannot delete file with id: " + child.getId());
+                }
             }
 
-            fileDAO.deleteFile(currentUser.getId(), fileID);
+            result = fileDAO.deleteFile(currentUser.getId(), fileID);
+            if (result != 1) {
+                throw new FileNotFoundException("Cannot delete file with id: " + fileID);
+            }
         } else {
             List<AbstractFile> children = fileDAO.getAllChildren(currentUser.getId(), fileID);
             if (children.size() != 0) {
                 throw new FolderIsNotEmpty("Folder is not empty");
             }
 
-            fileDAO.deleteFile(currentUser.getId(), fileID);
+            result = fileDAO.deleteFile(currentUser.getId(), fileID);
+            if (result != 1) {
+                throw new FileNotFoundException("Cannot delete file with id: " + fileID);
+            }
         }
     }
 
@@ -163,11 +184,11 @@ public class FileServiceImpl implements FileService {
         List<AbstractFile> rootFiles = fileDAO.getRootFiles(currentUser.getId());
 
         if (rootFiles.size() == 0) {
-            throw new P2016Exception("Root folder is missing ");
+            throw new FileNotFoundException("Root folder is missing ");
         }
 
         if (rootFiles.size() > 1) {
-            throw new P2016Exception("Root folder should be one ");
+            throw new FileOperationException("Root folder should be unique");
         }
 
         AbstractFile rootFolder = rootFiles.get(0);

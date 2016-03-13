@@ -1,15 +1,15 @@
 package org.sbezgin.p2016.db.dto;
 
 public class UserDTO {
-    private int id;
+    private Long id;
     private String email;
     private String password;
 
-    public int getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -34,18 +34,18 @@ public class UserDTO {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        UserDTO user = (UserDTO) o;
+        UserDTO userDTO = (UserDTO) o;
 
-        if (id != user.id) return false;
-        if (email != null ? !email.equals(user.email) : user.email != null) return false;
-        if (password != null ? !password.equals(user.password) : user.password != null) return false;
+        if (email != null ? !email.equals(userDTO.email) : userDTO.email != null) return false;
+        if (id != null ? !id.equals(userDTO.id) : userDTO.id != null) return false;
+        if (password != null ? !password.equals(userDTO.password) : userDTO.password != null) return false;
 
         return true;
     }
 
     @Override
     public int hashCode() {
-        int result = id;
+        int result = id != null ? id.hashCode() : 0;
         result = 31 * result + (email != null ? email.hashCode() : 0);
         result = 31 * result + (password != null ? password.hashCode() : 0);
         return result;

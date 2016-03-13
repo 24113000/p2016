@@ -27,6 +27,7 @@
         <property name="beanMap">
             <map>
                 <entry key="org.sbezgin.p2016.db.dto.file.FolderDTO" value="org.sbezgin.p2016.db.entity.file.Folder"/>
+                <entry key="org.sbezgin.p2016.db.dto.UserDTO" value="org.sbezgin.p2016.db.entity.User"/>
             </map>
         </property>
     </bean>
@@ -39,11 +40,16 @@
         <property name="userService" ref="userService" />
         <property name="beanTransformerHolder" ref="transformerHolder"/>
     </bean>
+    <bean id="userService" class="org.sbezgin.p2016.services.impl.UserServiceImpl">
+        <property name="userDAO" ref="userDAO"/>
+    </bean>
 
     <!-- dao -->
     <bean name="fileDAO" class="org.sbezgin.p2016.db.dao.impl.FileDAOImpl">
         <property name="sessionFactory" ref="sessionFactory"/>
     </bean>
+    <bean id="userDAO" class="org.sbezgin.p2016.db.dao.impl.UserDAOImpl">
+        <property name="sessionFactory" ref="sessionFactory"/>
+    </bean>
 
-    <bean id="userService" class="org.sbezgin.p2016.services.impl.UserServiceImpl"/>
 </beans>

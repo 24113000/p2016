@@ -1,4 +1,4 @@
-package org.sbezgin.p2016.services.file.impl;
+package org.sbezgin.p2016.service.file.impl;
 
 import org.sbezgin.p2016.common.P2016Exception;
 import org.sbezgin.p2016.db.dao.FileDAO;
@@ -10,14 +10,14 @@ import org.sbezgin.p2016.db.dto.file.TextFileDTO;
 import org.sbezgin.p2016.db.entity.file.AbstractFile;
 import org.sbezgin.p2016.db.entity.file.Folder;
 import org.sbezgin.p2016.db.entity.file.TextFile;
-import org.sbezgin.p2016.services.BeanTransformer;
-import org.sbezgin.p2016.services.BeanTransformerHolder;
-import org.sbezgin.p2016.services.file.FileNotFoundException;
-import org.sbezgin.p2016.services.file.FileOperationException;
-import org.sbezgin.p2016.services.file.FileService;
-import org.sbezgin.p2016.services.file.FolderIsNotEmpty;
-import org.sbezgin.p2016.services.impl.TextFileTransformerImpl;
-import org.sbezgin.p2016.services.impl.UserServiceImpl;
+import org.sbezgin.p2016.service.BeanTransformer;
+import org.sbezgin.p2016.service.BeanTransformerHolder;
+import org.sbezgin.p2016.service.file.FileNotFoundException;
+import org.sbezgin.p2016.service.file.FileOperationException;
+import org.sbezgin.p2016.service.file.FileService;
+import org.sbezgin.p2016.service.file.FolderIsNotEmpty;
+import org.sbezgin.p2016.service.impl.TextFileTransformerImpl;
+import org.sbezgin.p2016.service.impl.UserServiceImpl;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -69,7 +69,7 @@ public class FileServiceImpl implements FileService {
     public void saveFile(AbstractFileDTO file) {
         UserDTO currentUser = userService.getCurrentUser();
         Long id = file.getId();
-        int userID = currentUser.getId();
+        Long userID = currentUser.getId();
 
         String fileName = file.getName();
         if (fileName.contains("/") || (fileName.contains("\\\\"))) {

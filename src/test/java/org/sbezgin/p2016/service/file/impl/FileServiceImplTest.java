@@ -1,4 +1,4 @@
-package org.sbezgin.p2016.services.file.impl;
+package org.sbezgin.p2016.service.file.impl;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -7,7 +7,7 @@ import org.sbezgin.p2016.db.dto.file.AbstractFileDTO;
 import org.sbezgin.p2016.db.dto.file.FolderDTO;
 import org.sbezgin.p2016.db.dto.file.TextFileContentDTO;
 import org.sbezgin.p2016.db.dto.file.TextFileDTO;
-import org.sbezgin.p2016.services.file.FileService;
+import org.sbezgin.p2016.service.file.FileService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;

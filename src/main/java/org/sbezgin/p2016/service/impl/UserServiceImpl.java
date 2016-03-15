@@ -1,12 +1,12 @@
-package org.sbezgin.p2016.services.impl;
+package org.sbezgin.p2016.service.impl;
 
 import org.sbezgin.p2016.common.P2016Exception;
 import org.sbezgin.p2016.db.dao.UserDAO;
 import org.sbezgin.p2016.db.dto.UserDTO;
 import org.sbezgin.p2016.db.entity.User;
-import org.sbezgin.p2016.services.BeanTransformer;
-import org.sbezgin.p2016.services.BeanTransformerHolder;
-import org.sbezgin.p2016.services.UserService;
+import org.sbezgin.p2016.service.BeanTransformer;
+import org.sbezgin.p2016.service.BeanTransformerHolder;
+import org.sbezgin.p2016.service.UserService;
 
 public class UserServiceImpl implements UserService {
 
@@ -48,6 +48,7 @@ public class UserServiceImpl implements UserService {
         User user = userDAO.getUser(id);
         if (user != null) {
             userDAO.delete(user);
+            return;
         }
         throw new P2016Exception("Cannot delete user. User not found id: " + id);
     }
@@ -56,7 +57,7 @@ public class UserServiceImpl implements UserService {
     public void save(UserDTO userDTO) {
         BeanTransformer transformer = beanTransformerHolder.getTransformer(userDTO.getClass().getCanonicalName());
         if (userDTO.getId() == null) {
-            userDAO.save((User)transformer.transformDTOToEntity(userDTO.getClass().getCanonicalName()));
+            userDAO.save((User)transformer.transformDTOToEntity(userDTO));
         } else {
             User user = userDAO.getUser(userDTO.getId());
             transformer.copyFieldsToEntity(userDTO, user);
@@ -70,5 +71,13 @@ public class UserServiceImpl implements UserService {
 
     public void setUserDAO(UserDAO userDAO) {
         this.userDAO = userDAO;
+    }
+
+    public BeanTransformerHolder getBeanTransformerHolder() {
+        return beanTransformerHolder;
+    }
+
+    public void setBeanTransformerHolder(BeanTransformerHolder beanTransformerHolder) {
+        this.beanTransformerHolder = beanTransformerHolder;
     }
 }

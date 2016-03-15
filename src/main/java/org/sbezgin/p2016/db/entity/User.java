@@ -15,7 +15,7 @@ import java.util.Date;
 @Entity
 @Table(name = "User")
 public class User {
-    private int id;
+    private Long id;
     private String email;
     private String password;
     private String resetToken;
@@ -23,11 +23,11 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.TABLE, generator="USER_GEN")
-    public int getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -49,7 +49,7 @@ public class User {
         this.password = password;
     }
 
-    @Column(name = "reset_token", nullable = false)
+    @Column(name = "reset_token", nullable = true)
     public String getResetToken() {
         return resetToken;
     }
@@ -58,7 +58,7 @@ public class User {
         this.resetToken = resetToken;
     }
 
-    @Column(name = "token_expiration_date", nullable = false)
+    @Column(name = "token_expiration_date", nullable = true)
     public Date getExpirationTokenDate() {
         return expirationTokenDate;
     }
@@ -74,18 +74,23 @@ public class User {
 
         User user = (User) o;
 
-        if (id != user.id) return false;
         if (email != null ? !email.equals(user.email) : user.email != null) return false;
+        if (expirationTokenDate != null ? !expirationTokenDate.equals(user.expirationTokenDate) : user.expirationTokenDate != null)
+            return false;
+        if (id != null ? !id.equals(user.id) : user.id != null) return false;
         if (password != null ? !password.equals(user.password) : user.password != null) return false;
+        if (resetToken != null ? !resetToken.equals(user.resetToken) : user.resetToken != null) return false;
 
         return true;
     }
 
     @Override
     public int hashCode() {
-        int result = id;
+        int result = id != null ? id.hashCode() : 0;
         result = 31 * result + (email != null ? email.hashCode() : 0);
         result = 31 * result + (password != null ? password.hashCode() : 0);
+        result = 31 * result + (resetToken != null ? resetToken.hashCode() : 0);
+        result = 31 * result + (expirationTokenDate != null ? expirationTokenDate.hashCode() : 0);
         return result;
     }
 }

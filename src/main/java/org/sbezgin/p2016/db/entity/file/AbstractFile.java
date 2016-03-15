@@ -21,7 +21,7 @@ public abstract class AbstractFile {
     private String idPath;
     private Long parentId;
     private String className;
-    private Integer ownerID;
+    private Long ownerID;
     private FileContent fileContent;
 
     @Id
@@ -80,11 +80,11 @@ public abstract class AbstractFile {
     }
 
     @Column(name = "owner_id", nullable = false)
-    public Integer getOwnerID() {
+    public Long getOwnerID() {
         return ownerID;
     }
 
-    public void setOwnerID(Integer ownerID) {
+    public void setOwnerID(Long ownerID) {
         this.ownerID = ownerID;
     }
 

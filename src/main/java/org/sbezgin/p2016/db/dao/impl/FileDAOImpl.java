@@ -16,7 +16,7 @@ public class FileDAOImpl implements FileDAO {
     private SessionFactory sessionFactory;
 
     @Override
-    public AbstractFile getFileByID(int userID, long fileID) {
+    public AbstractFile getFileByID(Long userID, long fileID) {
         Session session = getSession();
         Query query = session.createQuery("from AbstractFile as file where file.ownerID = :ownerId and file.id = :fileId  ");
         query.setParameter("ownerId", userID);
@@ -25,14 +25,14 @@ public class FileDAOImpl implements FileDAO {
     }
 
     @Override
-    public List<AbstractFile> getFileByIDs(int userID, List<Long> fileIDs) {
+    public List<AbstractFile> getFileByIDs(Long userID, List<Long> fileIDs) {
         Session session = getSession();
         Query query = session.createQuery("from AbstractFile as file where file.ownerID = :ownerId and file.id = :fileId  ");
         return query.list();
     }
 
     @Override
-    public List<AbstractFile> getFilesByName(int userID, String folderPath, String fileName) {
+    public List<AbstractFile> getFilesByName(Long userID, String folderPath, String fileName) {
         Session session = getSession();
         Query query = session.createQuery("from AbstractFile as file where file.ownerID = :ownerId and file.name = :fileName and file.path = :folderPath  ");
         query.setParameter("ownerId", userID);
@@ -42,7 +42,7 @@ public class FileDAOImpl implements FileDAO {
     }
 
     @Override
-    public Folder getFolder(int userID, long folderID) {
+    public Folder getFolder(Long userID, long folderID) {
         AbstractFile fileByID = getFileByID(userID, folderID);
         if (fileByID != null && fileByID.getClassName().equals(Folder.class.getCanonicalName())) {
             return (Folder) fileByID;
@@ -52,18 +52,18 @@ public class FileDAOImpl implements FileDAO {
 
     @Transactional(propagation = Propagation.REQUIRED)
     @Override
-    public void saveOrUpdateFile(int userID, AbstractFile file) {
+    public void saveOrUpdateFile(Long userID, AbstractFile file) {
         Session session = getSession();
         session.save(file);
     }
 
     @Override
-    public void saveOrUpdateFiles(int userID, List<AbstractFile> files) {
+    public void saveOrUpdateFiles(Long userID, List<AbstractFile> files) {
 
     }
 
     @Override
-    public int deleteFile(int userID, long fileID) {
+    public int deleteFile(Long userID, long fileID) {
         Session session = getSession();
         Query query = session.createQuery("delete from AbstractFile as file where file.ownerID = :ownerId and file.id = :fileId ");
         query.setParameter("ownerId", userID);
@@ -72,7 +72,7 @@ public class FileDAOImpl implements FileDAO {
     }
 
     @Override
-    public List<AbstractFile> getRootFiles(int ownerID) {
+    public List<AbstractFile> getRootFiles(Long ownerID) {
         Session session = getSession();
         Query query = session.createQuery("from AbstractFile as file where file.ownerID = :ownerId and file.parentId is null ");
         query.setParameter("ownerId", ownerID);
@@ -80,7 +80,7 @@ public class FileDAOImpl implements FileDAO {
     }
 
     @Override
-    public List<AbstractFile> getChildren(int userID, long folderID, int start, int end) {
+    public List<AbstractFile> getChildren(Long userID, long folderID, int start, int end) {
         Session session = getSession();
         Query query = session.createQuery("from AbstractFile as file where file.ownerID = :ownerId and file.parentId = :folderID ");
         query.setParameter("ownerId", userID);
@@ -89,7 +89,7 @@ public class FileDAOImpl implements FileDAO {
     }
 
     @Override
-    public List<AbstractFile> getFilesByIDs(int userID, List<Long> idList) {
+    public List<AbstractFile> getFilesByIDs(Long userID, List<Long> idList) {
         Session session = getSession();
         Query query = session.createQuery("from AbstractFile as file where file.ownerID = :ownerId and file.id in :fileIds");
         query.setParameter("ownerId", userID);
@@ -98,7 +98,7 @@ public class FileDAOImpl implements FileDAO {
     }
 
     @Override
-    public List<AbstractFile> getAllChildren(int userId, long fileID) {
+    public List<AbstractFile> getAllChildren(Long userId, long fileID) {
         Session session = getSession();
         Query query = session.createQuery("from AbstractFile as file where file.ownerID = :ownerId and (file.idPath like :likeexp or file.idPath like :likeexp2) ");
         query.setParameter("ownerId", userId);

@@ -1,7 +1,7 @@
 package org.sbezgin.p2016.mvc;
 
 import org.sbezgin.p2016.db.dto.file.FolderDTO;
-import org.sbezgin.p2016.services.file.FileService;
+import org.sbezgin.p2016.service.file.FileService;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.AbstractController;
 

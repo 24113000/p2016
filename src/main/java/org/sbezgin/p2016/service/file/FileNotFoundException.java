@@ -1,4 +1,4 @@
-package org.sbezgin.p2016.services.file;
+package org.sbezgin.p2016.service.file;
 
 public class FileNotFoundException extends FileOperationException {
     public FileNotFoundException() {

@@ -12,7 +12,7 @@
     <!--File Transformers-->
     <bean name="dozer" class="org.dozer.DozerBeanMapper" />
 
-    <bean name="transformerHolder" class="org.sbezgin.p2016.services.impl.BeanTransformerHolderImpl">
+    <bean name="transformerHolder" class="org.sbezgin.p2016.service.impl.BeanTransformerHolderImpl">
         <property name="generalTransformer" ref="generalBeanTransformer"/>
         <property name="mappedTransformers">
             <map>
@@ -22,7 +22,7 @@
         </property>
     </bean>
 
-    <bean name="generalBeanTransformer" class="org.sbezgin.p2016.services.impl.GeneralBeanTransformerImpl">
+    <bean name="generalBeanTransformer" class="org.sbezgin.p2016.service.impl.GeneralBeanTransformerImpl">
         <property name="dozerBeanMapper" ref="dozer"/>
         <property name="beanMap">
             <map>
@@ -32,16 +32,17 @@
         </property>
     </bean>
 
-    <bean name="textFileTransformer" class="org.sbezgin.p2016.services.impl.TextFileTransformerImpl" />
+    <bean name="textFileTransformer" class="org.sbezgin.p2016.service.impl.TextFileTransformerImpl" />
 
     <!-- services -->
-    <bean name="fileService" class="org.sbezgin.p2016.services.file.impl.FileServiceImpl">
+    <bean name="fileService" class="org.sbezgin.p2016.service.file.impl.FileServiceImpl">
         <property name="fileDAO" ref="fileDAO" />
         <property name="userService" ref="userService" />
         <property name="beanTransformerHolder" ref="transformerHolder"/>
     </bean>
-    <bean id="userService" class="org.sbezgin.p2016.services.impl.UserServiceImpl">
+    <bean id="userService" class="org.sbezgin.p2016.service.impl.UserServiceImpl">
         <property name="userDAO" ref="userDAO"/>
+        <property name="beanTransformerHolder" ref="transformerHolder"/>
     </bean>
 
     <!-- dao -->

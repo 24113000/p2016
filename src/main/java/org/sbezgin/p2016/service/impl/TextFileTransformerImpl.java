@@ -1,10 +1,10 @@
-package org.sbezgin.p2016.services.impl;
+package org.sbezgin.p2016.service.impl;
 
 import org.sbezgin.p2016.db.dto.file.TextFileContentDTO;
 import org.sbezgin.p2016.db.dto.file.TextFileDTO;
 import org.sbezgin.p2016.db.entity.file.FileContent;
 import org.sbezgin.p2016.db.entity.file.TextFile;
-import org.sbezgin.p2016.services.BeanTransformer;
+import org.sbezgin.p2016.service.BeanTransformer;
 
 import java.nio.charset.Charset;
 

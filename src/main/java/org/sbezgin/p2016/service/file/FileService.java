@@ -1,4 +1,4 @@
-package org.sbezgin.p2016.services.file;
+package org.sbezgin.p2016.service.file;
 
 import org.sbezgin.p2016.db.dto.PermissionDTO;
 import org.sbezgin.p2016.db.dto.file.AbstractFileDTO;

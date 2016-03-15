@@ -1,10 +1,10 @@
-package org.sbezgin.p2016.services.impl;
+package org.sbezgin.p2016.service.impl;
 
 import org.apache.commons.collections.BidiMap;
 import org.apache.commons.collections.bidimap.DualHashBidiMap;
 import org.dozer.DozerBeanMapper;
 import org.sbezgin.p2016.common.P2016Exception;
-import org.sbezgin.p2016.services.BeanTransformer;
+import org.sbezgin.p2016.service.BeanTransformer;
 
 import java.util.Map;
 

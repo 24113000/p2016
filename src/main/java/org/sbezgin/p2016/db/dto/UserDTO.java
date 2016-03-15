@@ -1,9 +1,13 @@
 package org.sbezgin.p2016.db.dto;
 
+import java.util.Date;
+
 public class UserDTO {
     private Long id;
     private String email;
     private String password;
+    private String resetToken;
+    private Date expirationTokenDate;
 
     public Long getId() {
         return id;
@@ -27,6 +31,22 @@ public class UserDTO {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getResetToken() {
+        return resetToken;
+    }
+
+    public void setResetToken(String resetToken) {
+        this.resetToken = resetToken;
+    }
+
+    public Date getExpirationTokenDate() {
+        return expirationTokenDate;
+    }
+
+    public void setExpirationTokenDate(Date expirationTokenDate) {
+        this.expirationTokenDate = expirationTokenDate;
     }
 
     @Override

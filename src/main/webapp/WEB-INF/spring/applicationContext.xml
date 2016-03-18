@@ -18,6 +18,8 @@
             <map>
                 <entry key="org.sbezgin.p2016.db.entity.file.TextFile" value-ref="textFileTransformer"/>
                 <entry key="org.sbezgin.p2016.db.dto.file.TextFileDTO" value-ref="textFileTransformer"/>
+                <entry key="org.sbezgin.p2016.db.dto.file.FolderDTO" value-ref="folderTransformer"/>
+                <entry key="org.sbezgin.p2016.db.entity.file.Folder" value-ref="folderTransformer"/>
             </map>
         </property>
     </bean>
@@ -26,13 +28,15 @@
         <property name="dozerBeanMapper" ref="dozer"/>
         <property name="beanMap">
             <map>
-                <entry key="org.sbezgin.p2016.db.dto.file.FolderDTO" value="org.sbezgin.p2016.db.entity.file.Folder"/>
-                <entry key="org.sbezgin.p2016.db.dto.UserDTO" value="org.sbezgin.p2016.db.entity.User"/>
+                <entry key=""    value=""/>
+                <entry key="org.sbezgin.p2016.db.dto.UserDTO"           value="org.sbezgin.p2016.db.entity.User"/>
+                <entry key="org.sbezgin.p2016.db.dto.PermissionDTO"     value="org.sbezgin.p2016.db.entity.Permission"/>
             </map>
         </property>
     </bean>
 
     <bean name="textFileTransformer" class="org.sbezgin.p2016.service.impl.TextFileTransformerImpl" />
+    <bean name="folderTransformer" class="org.sbezgin.p2016.service.impl.FolderTransformerImpl" />
 
     <!-- services -->
     <bean name="fileService" class="org.sbezgin.p2016.service.file.impl.FileServiceImpl">

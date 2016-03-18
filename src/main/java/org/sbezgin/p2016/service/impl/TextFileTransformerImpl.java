@@ -1,35 +1,34 @@
 package org.sbezgin.p2016.service.impl;
 
+import org.sbezgin.p2016.db.dto.file.AbstractFileDTO;
 import org.sbezgin.p2016.db.dto.file.TextFileContentDTO;
 import org.sbezgin.p2016.db.dto.file.TextFileDTO;
+import org.sbezgin.p2016.db.entity.file.AbstractFile;
 import org.sbezgin.p2016.db.entity.file.FileContent;
 import org.sbezgin.p2016.db.entity.file.TextFile;
 import org.sbezgin.p2016.service.BeanTransformer;
 
 import java.nio.charset.Charset;
 
-public class TextFileTransformerImpl implements BeanTransformer<TextFileDTO, TextFile> {
+public class TextFileTransformerImpl extends AbstractFileTransformer implements BeanTransformer<TextFileDTO, TextFile> {
 
     @Override
     public TextFileDTO transformEntityToDTO(TextFile obj) {
         return transformEntityToDTO(obj, false);
     }
 
+
     public TextFileDTO transformEntityToDTO(TextFile obj, boolean isFull) {
-        TextFileDTO textFileDTO = new TextFileDTO();
-        textFileDTO.setId(obj.getId());
-        textFileDTO.setName(obj.getName());
+
+        TextFileDTO textFileDTO = (TextFileDTO) transformFileEntityToDTO(obj);
         textFileDTO.setType(obj.getType());
-        textFileDTO.setPath(obj.getPath());
-        textFileDTO.setParentId(obj.getParentId());
-        textFileDTO.setIdPath(obj.getIdPath());
 
         if (isFull && obj.getFileContent() != null) {
             FileContent fileContent = obj.getFileContent();
 
             TextFileContentDTO textFileContentDTO = new TextFileContentDTO();
             textFileContentDTO.setId(fileContent.getId());
-            textFileContentDTO.setData(new String(fileContent.getData(), Charset.defaultCharset())); //TODO add default charset to JVM
+            textFileContentDTO.setData(new String(fileContent.getData(), Charset.defaultCharset()));
 
             textFileDTO.setFileContent(textFileContentDTO);
         }
@@ -39,7 +38,7 @@ public class TextFileTransformerImpl implements BeanTransformer<TextFileDTO, Tex
 
     @Override
     public TextFile transformDTOToEntity(TextFileDTO obj) {
-        TextFile textFile = new TextFile();
+        TextFile textFile = (TextFile) transformFileDTOToEntity(obj);
 
         copyFieldsToEntity(obj, textFile);
 
@@ -48,14 +47,8 @@ public class TextFileTransformerImpl implements BeanTransformer<TextFileDTO, Tex
 
     @Override
     public void copyFieldsToEntity(TextFileDTO src, TextFile dest) {
-        dest.setId(src.getId());
-        dest.setName(src.getName());
-        dest.setType(src.getType());
-        dest.setPath(src.getPath());
-        dest.setParentId(src.getParentId());
-        dest.setIdPath(src.getIdPath());
-
         TextFileContentDTO textFileContentDTO = src.getFileContent();
+        dest.setType(src.getType());
         if (textFileContentDTO != null && dest.getFileContent() == null) {
             FileContent textFileContent = new FileContent();
             textFileContent.setId(textFileContentDTO.getId());
@@ -75,5 +68,15 @@ public class TextFileTransformerImpl implements BeanTransformer<TextFileDTO, Tex
                 destFileContent.setData(data.getBytes(Charset.defaultCharset()));
             }
         }
+    }
+
+    @Override
+    protected AbstractFileDTO getAbstractDTOInstance() {
+        return new TextFileDTO();
+    }
+
+    @Override
+    protected AbstractFile getAbstractEntityInstance() {
+        return new TextFile();
     }
 }

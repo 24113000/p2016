@@ -1,11 +1,17 @@
 package org.sbezgin.p2016.db.dto.file;
 
+import org.sbezgin.p2016.db.dto.PermissionDTO;
+
+import java.util.ArrayList;
+import java.util.List;
+
 public abstract class AbstractFileDTO {
     private Long id;
     private String name;
     private String path;
     private String idPath;
     private Long parentId;
+    private List<PermissionDTO> permissionDTOs = new ArrayList<>(5);
 
     public Long getId() {
         return id;
@@ -45,6 +51,14 @@ public abstract class AbstractFileDTO {
 
     public void setParentId(Long parentId) {
         this.parentId = parentId;
+    }
+
+    public List<PermissionDTO> getPermissionDTOs() {
+        return permissionDTOs;
+    }
+
+    public void setPermissionDTOs(List<PermissionDTO> permissionDTOs) {
+        this.permissionDTOs = permissionDTOs;
     }
 
     @Override

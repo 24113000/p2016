@@ -47,6 +47,9 @@ public class TextFileTransformerImpl extends AbstractFileTransformer implements 
 
     @Override
     public void copyFieldsToEntity(TextFileDTO src, TextFile dest) {
+
+        super.copyFileFieldsToEntity(src, dest);
+
         TextFileContentDTO textFileContentDTO = src.getFileContent();
         dest.setType(src.getType());
         if (textFileContentDTO != null && dest.getFileContent() == null) {

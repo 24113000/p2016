@@ -1,8 +1,10 @@
 package org.sbezgin.p2016.db.dto;
 
+import org.sbezgin.p2016.db.dto.file.AbstractFileDTO;
+
 public class PermissionDTO {
     private Long id;
-    private Long fileID;
+    private AbstractFileDTO fileDTO;
     private Boolean read;
     private Boolean write;
     private Boolean delete;
@@ -14,14 +16,6 @@ public class PermissionDTO {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public Long getFileID() {
-        return fileID;
-    }
-
-    public void setFileID(Long fileID) {
-        this.fileID = fileID;
     }
 
     public Boolean getRead() {
@@ -58,6 +52,14 @@ public class PermissionDTO {
         this.userID = userID;
     }
 
+    public AbstractFileDTO getFileDTO() {
+        return fileDTO;
+    }
+
+    public void setFileDTO(AbstractFileDTO fileDTO) {
+        this.fileDTO = fileDTO;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -66,8 +68,7 @@ public class PermissionDTO {
         PermissionDTO that = (PermissionDTO) o;
 
         if (delete != null ? !delete.equals(that.delete) : that.delete != null) return false;
-        if (fileID != null ? !fileID.equals(that.fileID) : that.fileID != null) return false;
-        if (id != null ? !id.equals(that.id) : that.id != null) return false;
+        if (fileDTO != null ? !fileDTO.equals(that.fileDTO) : that.fileDTO != null) return false;
         if (read != null ? !read.equals(that.read) : that.read != null) return false;
         if (userID != null ? !userID.equals(that.userID) : that.userID != null) return false;
         if (write != null ? !write.equals(that.write) : that.write != null) return false;
@@ -77,8 +78,7 @@ public class PermissionDTO {
 
     @Override
     public int hashCode() {
-        int result = id != null ? id.hashCode() : 0;
-        result = 31 * result + (fileID != null ? fileID.hashCode() : 0);
+        int result = 31 + (fileDTO != null ? fileDTO.hashCode() : 0);
         result = 31 * result + (read != null ? read.hashCode() : 0);
         result = 31 * result + (write != null ? write.hashCode() : 0);
         result = 31 * result + (delete != null ? delete.hashCode() : 0);

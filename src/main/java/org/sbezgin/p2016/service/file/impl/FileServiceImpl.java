@@ -32,11 +32,19 @@ public class FileServiceImpl implements FileService {
     private BeanTransformerHolder beanTransformerHolder;
 
     @Override
+    @Transactional(propagation = Propagation.REQUIRED)
     public AbstractFileDTO getFileByID(long fileID) {
+        UserDTO currentUser = userService.getCurrentUser();
+        AbstractFile file = fileDAO.getFileByID(currentUser.getId(), fileID);
+        if (file != null) {
+            BeanTransformer transformer = beanTransformerHolder.getTransformer(file.getClass().getCanonicalName());
+            return (AbstractFileDTO) transformer.transformEntityToDTO(file);
+        }
         return null;
     }
 
     @Override
+    @Transactional(propagation = Propagation.REQUIRED)
     public FolderDTO getFolder(long folderID) {
         UserDTO currentUser = userService.getCurrentUser();
         Folder folder = fileDAO.getFolder(currentUser.getId(), folderID);
@@ -48,6 +56,7 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
+    @Transactional(propagation = Propagation.REQUIRED)
     public List<AbstractFileDTO> getFilesByName(String folderPath, String fileName) {
         UserDTO currentUser = userService.getCurrentUser();
         List<AbstractFile> files = fileDAO.getFilesByName(currentUser.getId(), folderPath, fileName);
@@ -123,11 +132,15 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    public void setPermission(long fileD, PermissionDTO perm) {
-
+    @Transactional(propagation = Propagation.REQUIRED)
+    public void setPermission(AbstractFileDTO fileDTO, PermissionDTO perm) {
+        perm.setFileDTO(fileDTO);
+        fileDTO.getPermissionDTOs().add(perm);
+        saveFile(fileDTO);
     }
 
     @Override
+    @Transactional(propagation = Propagation.REQUIRED)
     public void renameFile(long fileID, String newName) {
         UserDTO currentUser = userService.getCurrentUser();
         AbstractFile file = fileDAO.getFileByID(currentUser.getId(), fileID);
@@ -139,6 +152,7 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
+    @Transactional(propagation = Propagation.REQUIRED)
     public void deleteFile(long fileID, boolean recursively) {
         UserDTO currentUser = userService.getCurrentUser();
         int result;
@@ -179,6 +193,7 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
+    @Transactional(propagation = Propagation.REQUIRED)
     public FolderDTO getRootFolder() {
         UserDTO currentUser = userService.getCurrentUser();
         List<AbstractFile> rootFiles = fileDAO.getRootFiles(currentUser.getId());
@@ -201,6 +216,7 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
+    @Transactional(propagation = Propagation.REQUIRED)
     public List<AbstractFileDTO> getChildren(long folderID, int start, int end) {
         UserDTO currentUser = userService.getCurrentUser();
 

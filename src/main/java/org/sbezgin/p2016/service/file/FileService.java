@@ -16,7 +16,7 @@ public interface FileService {
 
     void saveFile(AbstractFileDTO file);
 
-    void setPermission(long fileD, PermissionDTO perm);
+    void setPermission(AbstractFileDTO fileDTO, PermissionDTO perm);
 
     void renameFile(long fileID, String newName);
 

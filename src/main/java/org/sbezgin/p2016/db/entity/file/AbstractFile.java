@@ -1,6 +1,9 @@
 package org.sbezgin.p2016.db.entity.file;
 
+import org.sbezgin.p2016.db.entity.Permission;
+
 import javax.persistence.*;
+import java.util.List;
 
 @javax.persistence.TableGenerator(
         name="FILE_GEN",
@@ -23,6 +26,7 @@ public abstract class AbstractFile {
     private String className;
     private Long ownerID;
     private FileContent fileContent;
+    private List<Permission> permissions;
 
     @Id
     @GeneratedValue(strategy = GenerationType.TABLE, generator="FILE_GEN")
@@ -96,6 +100,15 @@ public abstract class AbstractFile {
 
     public void setFileContent(FileContent fileContent) {
         this.fileContent = fileContent;
+    }
+
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    public List<Permission> getPermissions() {
+        return permissions;
+    }
+
+    public void setPermissions(List<Permission> permissions) {
+        this.permissions = permissions;
     }
 
     @Override

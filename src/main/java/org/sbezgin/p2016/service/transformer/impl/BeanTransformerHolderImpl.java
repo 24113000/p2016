@@ -1,7 +1,7 @@
-package org.sbezgin.p2016.service.impl;
+package org.sbezgin.p2016.service.transformer.impl;
 
-import org.sbezgin.p2016.service.BeanTransformer;
-import org.sbezgin.p2016.service.BeanTransformerHolder;
+import org.sbezgin.p2016.service.transformer.BeanTransformer;
+import org.sbezgin.p2016.service.transformer.BeanTransformerHolder;
 
 import java.util.Map;
 

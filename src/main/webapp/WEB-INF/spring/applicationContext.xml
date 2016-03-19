@@ -12,7 +12,7 @@
     <!--File Transformers-->
     <bean name="dozer" class="org.dozer.DozerBeanMapper" />
 
-    <bean name="transformerHolder" class="org.sbezgin.p2016.service.impl.BeanTransformerHolderImpl">
+    <bean name="transformerHolder" class="org.sbezgin.p2016.service.transformer.impl.BeanTransformerHolderImpl">
         <property name="generalTransformer" ref="generalBeanTransformer"/>
         <property name="mappedTransformers">
             <map>
@@ -24,7 +24,7 @@
         </property>
     </bean>
 
-    <bean name="generalBeanTransformer" class="org.sbezgin.p2016.service.impl.GeneralBeanTransformerImpl">
+    <bean name="generalBeanTransformer" class="org.sbezgin.p2016.service.transformer.impl.GeneralBeanTransformerImpl">
         <property name="dozerBeanMapper" ref="dozer"/>
         <property name="beanMap">
             <map>
@@ -35,8 +35,8 @@
         </property>
     </bean>
 
-    <bean name="textFileTransformer" class="org.sbezgin.p2016.service.impl.TextFileTransformerImpl" />
-    <bean name="folderTransformer" class="org.sbezgin.p2016.service.impl.FolderTransformerImpl" />
+    <bean name="textFileTransformer" class="org.sbezgin.p2016.service.transformer.impl.TextFileTransformerImpl" />
+    <bean name="folderTransformer" class="org.sbezgin.p2016.service.transformer.impl.FolderTransformerImpl" />
 
     <!-- services -->
     <bean name="fileService" class="org.sbezgin.p2016.service.file.impl.FileServiceImpl">

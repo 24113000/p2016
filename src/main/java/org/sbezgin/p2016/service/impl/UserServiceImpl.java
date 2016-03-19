@@ -4,8 +4,8 @@ import org.sbezgin.p2016.common.P2016Exception;
 import org.sbezgin.p2016.db.dao.UserDAO;
 import org.sbezgin.p2016.db.dto.UserDTO;
 import org.sbezgin.p2016.db.entity.User;
-import org.sbezgin.p2016.service.BeanTransformer;
-import org.sbezgin.p2016.service.BeanTransformerHolder;
+import org.sbezgin.p2016.service.transformer.BeanTransformer;
+import org.sbezgin.p2016.service.transformer.BeanTransformerHolder;
 import org.sbezgin.p2016.service.UserService;
 
 public class UserServiceImpl implements UserService {

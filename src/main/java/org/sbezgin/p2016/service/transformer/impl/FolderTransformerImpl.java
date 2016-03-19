@@ -1,10 +1,10 @@
-package org.sbezgin.p2016.service.impl;
+package org.sbezgin.p2016.service.transformer.impl;
 
 import org.sbezgin.p2016.db.dto.file.AbstractFileDTO;
 import org.sbezgin.p2016.db.dto.file.FolderDTO;
 import org.sbezgin.p2016.db.entity.file.AbstractFile;
 import org.sbezgin.p2016.db.entity.file.Folder;
-import org.sbezgin.p2016.service.BeanTransformer;
+import org.sbezgin.p2016.service.transformer.BeanTransformer;
 
 public class FolderTransformerImpl extends AbstractFileTransformer implements BeanTransformer<FolderDTO, Folder> {
     @Override

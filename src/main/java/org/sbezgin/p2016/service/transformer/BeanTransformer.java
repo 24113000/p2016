@@ -1,4 +1,4 @@
-package org.sbezgin.p2016.service;
+package org.sbezgin.p2016.service.transformer;
 
 public interface BeanTransformer<D, E> {
 

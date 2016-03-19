@@ -1,4 +1,4 @@
-package org.sbezgin.p2016.service.impl;
+package org.sbezgin.p2016.service.transformer.impl;
 
 import org.sbezgin.p2016.db.dto.file.AbstractFileDTO;
 import org.sbezgin.p2016.db.entity.file.AbstractFile;

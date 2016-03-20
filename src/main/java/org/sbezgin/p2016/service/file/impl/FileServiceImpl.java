@@ -1,5 +1,6 @@
 package org.sbezgin.p2016.service.file.impl;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.sbezgin.p2016.common.P2016Exception;
 import org.sbezgin.p2016.db.dao.FileDAO;
 import org.sbezgin.p2016.db.dto.PermissionDTO;
@@ -7,6 +8,7 @@ import org.sbezgin.p2016.db.dto.UserDTO;
 import org.sbezgin.p2016.db.dto.file.AbstractFileDTO;
 import org.sbezgin.p2016.db.dto.file.FolderDTO;
 import org.sbezgin.p2016.db.dto.file.TextFileDTO;
+import org.sbezgin.p2016.db.entity.Permission;
 import org.sbezgin.p2016.db.entity.file.AbstractFile;
 import org.sbezgin.p2016.db.entity.file.Folder;
 import org.sbezgin.p2016.db.entity.file.TextFile;
@@ -16,6 +18,7 @@ import org.sbezgin.p2016.service.file.FileNotFoundException;
 import org.sbezgin.p2016.service.file.FileOperationException;
 import org.sbezgin.p2016.service.file.FileService;
 import org.sbezgin.p2016.service.file.FolderIsNotEmpty;
+import org.sbezgin.p2016.service.transformer.impl.AbstractFileTransformer;
 import org.sbezgin.p2016.service.transformer.impl.TextFileTransformerImpl;
 import org.sbezgin.p2016.service.impl.UserServiceImpl;
 import org.springframework.transaction.annotation.Propagation;
@@ -137,6 +140,41 @@ public class FileServiceImpl implements FileService {
         perm.setFileDTO(fileDTO);
         fileDTO.getPermissionDTOs().add(perm);
         saveFile(fileDTO);
+    }
+
+    @Override
+    public void setFolderPermissionRecursively(FolderDTO folderDTO, PermissionDTO permDTO) {
+        UserDTO currentUser = userService.getCurrentUser();
+        setPermission(folderDTO, permDTO);
+        List<AbstractFile> children = fileDAO.getAllChildren(currentUser.getId(), folderDTO.getId());
+        for (AbstractFile child : children) {
+
+            AbstractFileTransformer fileTransformer = (AbstractFileTransformer) getTransformer(child);
+
+            List<Permission> permissions = child.getPermissions();
+            if (permissions == null) {
+                permissions = new ArrayList<>();
+            }
+
+            Permission permission = getPermissionForUser(permissions, permDTO.getUserID());
+            if (permission == null) {
+                permission = new Permission();
+            }
+
+            fileTransformer.copyPermissionDTOToEntity(permDTO, permission, child);
+            permissions.add(permission);
+
+            fileDAO.saveOrUpdateFile(currentUser.getId(), child);
+        }
+    }
+
+    private Permission getPermissionForUser(List<Permission> permissions, Long userId) {
+        for (Permission permission : permissions) {
+            if (permission.getUserID().equals(userId)) {
+                return permission;
+            }
+        }
+        return null;
     }
 
     @Override

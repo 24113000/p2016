@@ -18,6 +18,8 @@ public interface FileService {
 
     void setPermission(AbstractFileDTO fileDTO, PermissionDTO perm);
 
+    void setFolderPermissionRecursively(FolderDTO folderDTO, PermissionDTO perm);
+
     void renameFile(long fileID, String newName);
 
     void deleteFile(long fileID, boolean recursively);

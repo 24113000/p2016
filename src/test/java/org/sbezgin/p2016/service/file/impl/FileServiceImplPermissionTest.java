@@ -8,6 +8,7 @@ import org.sbezgin.p2016.db.dto.UserDTO;
 import org.sbezgin.p2016.db.dto.file.AbstractFileDTO;
 import org.sbezgin.p2016.db.dto.file.FolderDTO;
 import org.sbezgin.p2016.db.dto.file.TextFileDTO;
+import org.sbezgin.p2016.db.entity.file.Folder;
 import org.sbezgin.p2016.service.UserService;
 import org.sbezgin.p2016.service.file.FileService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,9 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 import static org.util.TestUtil.commitAndStartTransaction;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -47,6 +46,74 @@ public class FileServiceImplPermissionTest {
         createUsers();
 
         testSetPermission();
+        testUpdatePermission();
+        testSetPermissionRecursively();
+    }
+
+    private void testUpdatePermission() {
+        List<AbstractFileDTO> files = fileService.getFilesByName("/ROOT", "Test File");
+        AbstractFileDTO fileDTO = files.get(0);
+        PermissionDTO permissionDTO = fileDTO.getPermissionDTOs().get(0);
+        permissionDTO.setWrite(true);
+        permissionDTO.setDelete(false);
+
+        fileService.saveFile(fileDTO);
+
+        commitAndStartTransaction();
+
+        files = fileService.getFilesByName("/ROOT", "Test File");
+        fileDTO = files.get(0);
+        permissionDTO = fileDTO.getPermissionDTOs().get(0);
+        assertTrue(permissionDTO.getRead());
+        assertTrue(permissionDTO.getWrite());
+        assertFalse(permissionDTO.getDelete());
+
+        Long user2ID = userIDs.get("blabla2@ukr.net");
+        assertEquals(user2ID, permissionDTO.getUserID());
+    }
+
+    private void testSetPermissionRecursively() {
+        FolderDTO firstFolder = (FolderDTO) fileService.getFilesByName("/ROOT", "FirstFolder").get(0);
+
+        Long user2ID = userIDs.get("blabla2@ukr.net");
+
+        PermissionDTO permissionDTO = new PermissionDTO();
+        permissionDTO.setUserID(user2ID);
+        permissionDTO.setRead(true);
+
+        fileService.setFolderPermissionRecursively(firstFolder, permissionDTO);
+
+        commitAndStartTransaction();
+
+        firstFolder = (FolderDTO) fileService.getFilesByName("/ROOT", "FirstFolder").get(0);
+        List<AbstractFileDTO> children = fileService.getChildren(firstFolder.getId(), 0, 50);
+
+        FolderDTO secondFolder = (FolderDTO) children.get(0);
+        children = fileService.getChildren(secondFolder.getId(), 0, 50);
+
+        TextFileDTO textFileDTO = (TextFileDTO) children.get(0);
+
+        //-------------------------------------
+        List<PermissionDTO> permissionDTOs = firstFolder.getPermissionDTOs();
+        assertEquals(1, permissionDTOs.size());
+        assertEquals(permissionDTO, permissionDTOs.get(0));
+
+
+        permissionDTOs = secondFolder.getPermissionDTOs();
+        assertEquals(1, permissionDTOs.size());
+        PermissionDTO savedPerm = permissionDTOs.get(0);
+        assertTrue(savedPerm.getRead());
+        assertNull(savedPerm.getWrite());
+        assertNull(savedPerm.getDelete());
+        assertEquals(user2ID, savedPerm.getUserID());
+
+        permissionDTOs = textFileDTO.getPermissionDTOs();
+        assertEquals(1, permissionDTOs.size());
+        savedPerm = permissionDTOs.get(0);
+        assertTrue(savedPerm.getRead());
+        assertNull(savedPerm.getWrite());
+        assertNull(savedPerm.getDelete());
+        assertEquals(user2ID, savedPerm.getUserID());
     }
 
     private void createUsers() {
@@ -99,6 +166,7 @@ public class FileServiceImplPermissionTest {
 
         fileService.setPermission(file, permissionDTO);
         commitAndStartTransaction();
+
         AbstractFileDTO fileDTO = fileService.getFileByID(file.getId());
 
         assertNotNull(fileDTO);
@@ -121,6 +189,29 @@ public class FileServiceImplPermissionTest {
         commitAndStartTransaction();
 
         FolderDTO savedRootFolder = fileService.getRootFolder();
+        FolderDTO firstFolder = new FolderDTO();
+        firstFolder.setName("FirstFolder");
+        firstFolder.setParentId(savedRootFolder.getId());
+        fileService.saveFile(firstFolder);
+
+        commitAndStartTransaction();
+
+        firstFolder = (FolderDTO) fileService.getFilesByName("/ROOT", "FirstFolder").get(0);
+        FolderDTO secondFolder = new FolderDTO();
+        secondFolder.setName("SecondFolder");
+        secondFolder.setParentId(firstFolder.getId());
+        fileService.saveFile(secondFolder);
+
+        commitAndStartTransaction();
+
+        secondFolder = (FolderDTO) fileService.getFilesByName("/ROOT/FirstFolder", "SecondFolder").get(0);
+        TextFileDTO deepFile = new TextFileDTO();
+        deepFile.setName("THE_FILE");
+        deepFile.setType(FileType.JSON);
+        deepFile.setParentId(secondFolder.getId());
+        fileService.saveFile(deepFile);
+
+        commitAndStartTransaction();
 
         assertEquals(rootFolder, savedRootFolder);
 

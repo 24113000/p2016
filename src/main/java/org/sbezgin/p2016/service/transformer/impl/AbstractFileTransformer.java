@@ -90,7 +90,7 @@ public abstract class AbstractFileTransformer {
 
     //if it updates already existed permission, we don't need set id
     //if it updates new object, we also don't need set id
-    protected void copyPermissionDTOToEntity(PermissionDTO permissionDTO, Permission permission, AbstractFile abstractFile) {
+    public void copyPermissionDTOToEntity(PermissionDTO permissionDTO, Permission permission, AbstractFile abstractFile) {
         permission.setUserID(permissionDTO.getUserID());
         permission.setRead(permissionDTO.getRead());
         permission.setWrite(permissionDTO.getWrite());

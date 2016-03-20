@@ -8,7 +8,6 @@ import org.sbezgin.p2016.db.dto.UserDTO;
 import org.sbezgin.p2016.db.dto.file.AbstractFileDTO;
 import org.sbezgin.p2016.db.dto.file.FolderDTO;
 import org.sbezgin.p2016.db.dto.file.TextFileDTO;
-import org.sbezgin.p2016.db.entity.file.Folder;
 import org.sbezgin.p2016.service.UserService;
 import org.sbezgin.p2016.service.file.FileService;
 import org.springframework.beans.factory.annotation.Autowired;

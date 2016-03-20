@@ -10,6 +10,7 @@ import org.sbezgin.p2016.db.dto.file.FolderDTO;
 import org.sbezgin.p2016.db.dto.file.TextFileDTO;
 import org.sbezgin.p2016.service.UserService;
 import org.sbezgin.p2016.service.file.FileService;
+import org.sbezgin.p2016.service.impl.UserServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
@@ -22,6 +23,8 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.when;
 import static org.util.TestUtil.commitAndStartTransaction;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -41,6 +44,16 @@ public class FileServiceImplPermissionTest {
     @Test
     @Transactional
     public void testPermission() {
+
+        FileServiceImpl service = (FileServiceImpl) fileService;
+        UserServiceImpl userService = spy(service.getUserService());
+        when(userService.getCurrentUser()).then(invocationOnMock -> {
+            UserDTO user = new UserDTO();
+            user.setId(1L);
+            return user;
+        });
+        service.setUserService(userService);
+
         createFoldersAndFiles();
         createUsers();
 

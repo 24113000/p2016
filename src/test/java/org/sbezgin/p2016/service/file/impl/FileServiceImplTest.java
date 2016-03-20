@@ -2,12 +2,16 @@ package org.sbezgin.p2016.service.file.impl;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import org.sbezgin.p2016.common.FileType;
+import org.sbezgin.p2016.db.dto.UserDTO;
 import org.sbezgin.p2016.db.dto.file.AbstractFileDTO;
 import org.sbezgin.p2016.db.dto.file.FolderDTO;
 import org.sbezgin.p2016.db.dto.file.TextFileContentDTO;
 import org.sbezgin.p2016.db.dto.file.TextFileDTO;
 import org.sbezgin.p2016.service.file.FileService;
+import org.sbezgin.p2016.service.impl.UserServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
@@ -20,6 +24,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.when;
 import static org.util.TestUtil.commitAndStartTransaction;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -36,6 +42,16 @@ public class FileServiceImplTest {
     @Test
     @Transactional
     public void testFileOperation() {
+
+        FileServiceImpl service = (FileServiceImpl) fileService;
+        UserServiceImpl userService = spy(service.getUserService());
+        when(userService.getCurrentUser()).then(invocationOnMock -> {
+            UserDTO user = new UserDTO();
+            user.setId(1L);
+            return user;
+        });
+        service.setUserService(userService);
+
         testSaveFolder();
         testSaveChildren();
         testUpdateFiles();

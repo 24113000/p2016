@@ -1,12 +1,15 @@
 package org.sbezgin.p2016.service.file.impl;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.sbezgin.p2016.db.dto.UserDTO;
 import org.sbezgin.p2016.db.dto.file.AbstractFileDTO;
 import org.sbezgin.p2016.db.dto.file.FolderDTO;
 import org.sbezgin.p2016.service.file.FileNotFoundException;
 import org.sbezgin.p2016.service.file.FileService;
 import org.sbezgin.p2016.service.file.FolderIsNotEmpty;
+import org.sbezgin.p2016.service.impl.UserServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
@@ -17,6 +20,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.when;
 import static org.util.TestUtil.commitAndStartTransaction;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -26,12 +31,23 @@ import static org.util.TestUtil.commitAndStartTransaction;
 })
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
 public class FileServiceImplNegativeTest {
+
     @Autowired
     private FileService fileService;
 
     @Test
     @Transactional
     public void testNegativeFileOperation() {
+
+        FileServiceImpl service = (FileServiceImpl) fileService;
+        UserServiceImpl userService = spy(service.getUserService());
+        when(userService.getCurrentUser()).then(invocationOnMock -> {
+            UserDTO user = new UserDTO();
+            user.setId(1L);
+            return user;
+        });
+        service.setUserService(userService);
+
         testGettingRootFolderIfDoesntExist();
         testFolderByIncorrectID();
         testGetChildrenFolderByIncorrectID();

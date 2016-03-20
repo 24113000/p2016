@@ -15,9 +15,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDTO getCurrentUser() {
-        UserDTO user = new UserDTO();
-        user.setId(1L);
-        return user;
+        return null;
     }
 
     @Override

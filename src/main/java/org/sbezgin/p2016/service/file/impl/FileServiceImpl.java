@@ -11,10 +11,7 @@ import org.sbezgin.p2016.db.entity.Permission;
 import org.sbezgin.p2016.db.entity.file.AbstractFile;
 import org.sbezgin.p2016.db.entity.file.Folder;
 import org.sbezgin.p2016.db.entity.file.TextFile;
-import org.sbezgin.p2016.service.file.FileNotFoundException;
-import org.sbezgin.p2016.service.file.FileOperationException;
-import org.sbezgin.p2016.service.file.FileService;
-import org.sbezgin.p2016.service.file.FolderIsNotEmpty;
+import org.sbezgin.p2016.service.file.*;
 import org.sbezgin.p2016.service.impl.UserServiceImpl;
 import org.sbezgin.p2016.service.transformer.BeanTransformer;
 import org.sbezgin.p2016.service.transformer.BeanTransformerHolder;
@@ -130,6 +127,13 @@ public class FileServiceImpl implements FileService {
                 throw new FileNotFoundException("Cannot get file " + file.getName() + " by id " + file.getId());
             }
 
+            if (!savedFile.getOwnerID().equals(currentUser.getId())) {
+                Permission permission = fileDAO.getUserFilePermission(savedFile.getId(), userID);
+                if (permission == null || !permission.getWrite()) {
+                    throw new FileAccessDeiniedException("User " + userID + " don't have access to file " + savedFile.getId());
+                }
+            }
+
             BeanTransformer transformer = getTransformer(savedFile);
             transformer.copyFieldsToEntity(file, savedFile);
 
@@ -198,6 +202,12 @@ public class FileServiceImpl implements FileService {
     public void deleteFile(long fileID, boolean recursively) {
         UserDTO currentUser = userService.getCurrentUser();
         int result;
+        AbstractFile file = fileDAO.getFileByID(currentUser.getId(), fileID);
+
+        if (file == null) {
+            throw new FileNotFoundException("Cannot find file: " + fileID);
+        }
+
         if (recursively) {
             List<AbstractFile> children = fileDAO.getAllChildren(currentUser.getId(), fileID);
             children.sort((o1, o2) -> {
@@ -211,12 +221,17 @@ public class FileServiceImpl implements FileService {
                     }
             );
             for (AbstractFile child : children) {
+
+                checkDeletePermission(currentUser.getId(), child);
+
                 int childResult = fileDAO.deleteFile(currentUser.getId(), child.getId());
                 if (childResult != 1) {
                     throw new FileNotFoundException("Cannot delete file with id: " + child.getId());
                 }
+
             }
 
+            checkDeletePermission(currentUser.getId(), file);
             result = fileDAO.deleteFile(currentUser.getId(), fileID);
             if (result != 1) {
                 throw new FileNotFoundException("Cannot delete file with id: " + fileID);
@@ -227,9 +242,20 @@ public class FileServiceImpl implements FileService {
                 throw new FolderIsNotEmpty("Folder is not empty");
             }
 
+            checkDeletePermission(currentUser.getId(), file);
+
             result = fileDAO.deleteFile(currentUser.getId(), fileID);
             if (result != 1) {
                 throw new FileNotFoundException("Cannot delete file with id: " + fileID);
+            }
+        }
+    }
+
+    private void checkDeletePermission(Long userID, AbstractFile file) {
+        if (!file.getOwnerID().equals(userID)) {
+            Permission permission = fileDAO.getUserFilePermission(userID, file.getId());
+            if (permission == null || !permission.getDelete()) {
+                throw new FileAccessDeiniedException("User " + userID + " don't have access to file " + file.getId());
             }
         }
     }
@@ -291,12 +317,18 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public PermissionDTO getUserFilePermission(AbstractFileDTO fileDTO, UserDTO userDTO) {
+        Permission permission = fileDAO.getUserFilePermission(fileDTO.getId(), userDTO.getId());
+        if (permission != null) {
+            BeanTransformer beanTransformer = getTransformer(permission);
+            return (PermissionDTO) beanTransformer.transformEntityToDTO(permission);
+        }
         return null;
     }
 
     @Override
     public PermissionDTO getCurrentUserFilePermission(AbstractFileDTO fileDTO) {
-        return null;
+        UserDTO currentUser = userService.getCurrentUser();
+        return getUserFilePermission(fileDTO, currentUser);
     }
 
     public FileDAO getFileDAO() {

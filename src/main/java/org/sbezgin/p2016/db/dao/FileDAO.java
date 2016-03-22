@@ -1,6 +1,7 @@
 package org.sbezgin.p2016.db.dao;
 
 
+import org.sbezgin.p2016.db.entity.Permission;
 import org.sbezgin.p2016.db.entity.file.AbstractFile;
 import org.sbezgin.p2016.db.entity.file.Folder;
 
@@ -28,4 +29,6 @@ public interface FileDAO {
     List<AbstractFile> getFilesByIDs(Long userID, List<Long> idList);
 
     List<AbstractFile> getAllChildren(Long currentUserId, long fileID);
+
+    Permission getUserFilePermission(Long fileID, Long useID);
 }

@@ -4,6 +4,7 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.sbezgin.p2016.db.dao.FileDAO;
+import org.sbezgin.p2016.db.entity.Permission;
 import org.sbezgin.p2016.db.entity.file.AbstractFile;
 import org.sbezgin.p2016.db.entity.file.Folder;
 import org.springframework.transaction.annotation.Propagation;
@@ -105,6 +106,16 @@ public class FileDAOImpl implements FileDAO {
         query.setParameter("likeexp", "%/" + fileID + "/%");
         query.setParameter("likeexp2", "%/" + fileID);
         return query.list();
+    }
+
+    @Override
+    public Permission getUserFilePermission(Long fileID, Long useID) {
+        Session session = getSession();
+        Query query = session.createQuery(" from Permission as perm where perm.abstractFile.id = :fileID and userID = :userID ");
+        query.setParameter("userID", useID);
+        query.setParameter("fileID", fileID);
+
+        return (Permission) query.uniqueResult();
     }
 
     private Session getSession() {

@@ -3,6 +3,7 @@ package org.sbezgin.p2016.db.dto.file;
 import org.sbezgin.p2016.db.dto.PermissionDTO;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public abstract class AbstractFileDTO {
@@ -11,6 +12,9 @@ public abstract class AbstractFileDTO {
     private String path;
     private String idPath;
     private Long parentId;
+    private Date createDate;
+    private Date updateDate;
+
     private List<PermissionDTO> permissionDTOs = new ArrayList<>(5);
 
     public Long getId() {
@@ -59,6 +63,22 @@ public abstract class AbstractFileDTO {
 
     public void setPermissionDTOs(List<PermissionDTO> permissionDTOs) {
         this.permissionDTOs = permissionDTOs;
+    }
+
+    public Date getCreateDate() {
+        return createDate;
+    }
+
+    public void setCreateDate(Date createDate) {
+        this.createDate = createDate;
+    }
+
+    public Date getUpdateDate() {
+        return updateDate;
+    }
+
+    public void setUpdateDate(Date updateDate) {
+        this.updateDate = updateDate;
     }
 
     @Override

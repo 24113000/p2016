@@ -1,9 +1,11 @@
 package org.sbezgin.p2016.service.file;
 
 import org.sbezgin.p2016.db.dto.PermissionDTO;
+import org.sbezgin.p2016.db.dto.UserDTO;
 import org.sbezgin.p2016.db.dto.file.AbstractFileDTO;
 import org.sbezgin.p2016.db.dto.file.FolderDTO;
 import org.sbezgin.p2016.db.dto.file.TextFileDTO;
+import org.sbezgin.p2016.db.entity.Permission;
 
 import java.util.List;
 
@@ -31,4 +33,8 @@ public interface FileService {
     List<AbstractFileDTO> getFilesByType(String javaType);
 
     TextFileDTO getFullTextFile(long fileID);
+
+    PermissionDTO getUserFilePermission(AbstractFileDTO fileDTO, UserDTO userDTO);
+
+    PermissionDTO getCurrentUserFilePermission(AbstractFileDTO fileDTO);
 }

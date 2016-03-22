@@ -19,6 +19,7 @@ import org.springframework.test.context.ContextHierarchy;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -178,6 +179,10 @@ public class FileServiceImplTest {
         TextFileDTO file = fileService.getFullTextFile(fileID);
 
         assertNotNull(file);
+        Date createDate = file.getCreateDate();
+        assertNotNull(createDate);
+        Date updateDate = file.getUpdateDate();
+        assertEquals(createDate, updateDate);
 
         TextFileContentDTO fileContent = file.getFileContent();
         fileContent.setData("Test String 123 -- 2");
@@ -190,6 +195,7 @@ public class FileServiceImplTest {
         TextFileContentDTO savedFileContent = savedFile.getFileContent();
         assertNotNull(savedFileContent);
         assertEquals("Test String 123 -- 2", savedFileContent.getData());
+        assertEquals(updateDate, file.getUpdateDate());
     }
 
     private void testSaveFolder() {

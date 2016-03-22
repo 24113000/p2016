@@ -3,6 +3,7 @@ package org.sbezgin.p2016.db.entity.file;
 import org.sbezgin.p2016.db.entity.Permission;
 
 import javax.persistence.*;
+import java.util.Date;
 import java.util.List;
 
 @javax.persistence.TableGenerator(
@@ -27,6 +28,8 @@ public abstract class AbstractFile {
     private Long ownerID;
     private FileContent fileContent;
     private List<Permission> permissions;
+    private Date createDate;
+    private Date updateDate;
 
     @Id
     @GeneratedValue(strategy = GenerationType.TABLE, generator="FILE_GEN")
@@ -109,6 +112,24 @@ public abstract class AbstractFile {
 
     public void setPermissions(List<Permission> permissions) {
         this.permissions = permissions;
+    }
+
+    @Column(name = "create_date", nullable = false)
+    public Date getCreateDate() {
+        return createDate;
+    }
+
+    public void setCreateDate(Date createDate) {
+        this.createDate = createDate;
+    }
+
+    @Column(name = "update_date", nullable = false)
+    public Date getUpdateDate() {
+        return updateDate;
+    }
+
+    public void setUpdateDate(Date updateDate) {
+        this.updateDate = updateDate;
     }
 
     @Override

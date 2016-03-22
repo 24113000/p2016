@@ -1,6 +1,5 @@
 package org.sbezgin.p2016.service.file.impl;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.sbezgin.p2016.common.P2016Exception;
 import org.sbezgin.p2016.db.dao.FileDAO;
 import org.sbezgin.p2016.db.dto.PermissionDTO;
@@ -12,19 +11,20 @@ import org.sbezgin.p2016.db.entity.Permission;
 import org.sbezgin.p2016.db.entity.file.AbstractFile;
 import org.sbezgin.p2016.db.entity.file.Folder;
 import org.sbezgin.p2016.db.entity.file.TextFile;
-import org.sbezgin.p2016.service.transformer.BeanTransformer;
-import org.sbezgin.p2016.service.transformer.BeanTransformerHolder;
 import org.sbezgin.p2016.service.file.FileNotFoundException;
 import org.sbezgin.p2016.service.file.FileOperationException;
 import org.sbezgin.p2016.service.file.FileService;
 import org.sbezgin.p2016.service.file.FolderIsNotEmpty;
+import org.sbezgin.p2016.service.impl.UserServiceImpl;
+import org.sbezgin.p2016.service.transformer.BeanTransformer;
+import org.sbezgin.p2016.service.transformer.BeanTransformerHolder;
 import org.sbezgin.p2016.service.transformer.impl.AbstractFileTransformer;
 import org.sbezgin.p2016.service.transformer.impl.TextFileTransformerImpl;
-import org.sbezgin.p2016.service.impl.UserServiceImpl;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -120,6 +120,9 @@ public class FileServiceImpl implements FileService {
                 fileEntity.setPath(newPath);
             }
 
+            Date date = new Date();
+            fileEntity.setCreateDate(date);
+            fileEntity.setUpdateDate(date);
             fileDAO.saveOrUpdateFile(userID, fileEntity);
         } else {
             AbstractFile savedFile = fileDAO.getFileByID(userID, file.getId());
@@ -130,6 +133,7 @@ public class FileServiceImpl implements FileService {
             BeanTransformer transformer = getTransformer(savedFile);
             transformer.copyFieldsToEntity(file, savedFile);
 
+            savedFile.setUpdateDate(new Date());
             fileDAO.saveOrUpdateFile(userID, savedFile);
         }
     }
@@ -283,6 +287,16 @@ public class FileServiceImpl implements FileService {
         AbstractFile textFile = fileDAO.getFileByID(currentUser.getId(), fileID);
         TextFileTransformerImpl transformer = (TextFileTransformerImpl) beanTransformerHolder.getTransformer(textFile.getClassName());
         return transformer.transformEntityToDTO((TextFile) textFile, true);
+    }
+
+    @Override
+    public PermissionDTO getUserFilePermission(AbstractFileDTO fileDTO, UserDTO userDTO) {
+        return null;
+    }
+
+    @Override
+    public PermissionDTO getCurrentUserFilePermission(AbstractFileDTO fileDTO) {
+        return null;
     }
 
     public FileDAO getFileDAO() {

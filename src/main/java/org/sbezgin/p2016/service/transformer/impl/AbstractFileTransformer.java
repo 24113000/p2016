@@ -24,6 +24,8 @@ public abstract class AbstractFileTransformer {
         dto.setPath(obj.getPath());
         dto.setParentId(obj.getParentId());
         dto.setIdPath(obj.getIdPath());
+        dto.setCreateDate(obj.getCreateDate());
+        dto.setUpdateDate(obj.getUpdateDate());
 
         List<Permission> permissions = obj.getPermissions();
         if (CollectionUtils.isNotEmpty(permissions)) {
@@ -59,6 +61,8 @@ public abstract class AbstractFileTransformer {
         dest.setPath(src.getPath());
         dest.setParentId(src.getParentId());
         dest.setIdPath(src.getIdPath());
+        dest.setCreateDate(src.getCreateDate());
+        dest.setUpdateDate(src.getUpdateDate());
 
         if (CollectionUtils.isNotEmpty(src.getPermissionDTOs())){
             List<Permission> permissions = new ArrayList<>();

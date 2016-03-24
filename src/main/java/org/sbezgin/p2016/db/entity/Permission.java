@@ -22,7 +22,7 @@ public class Permission {
     private AbstractFile abstractFile;
     private Boolean read;
     private Boolean write;
-    private Boolean delete;
+    private Boolean del;
     private Long userID;
 
     @Id
@@ -53,13 +53,13 @@ public class Permission {
         this.write = write;
     }
 
-    @Column(name = "delete", nullable = true)
-    public Boolean getDelete() {
-        return delete;
+    @Column(name = "del", nullable = true)
+    public Boolean getDel() {
+        return del;
     }
 
-    public void setDelete(Boolean delete) {
-        this.delete = delete;
+    public void setDel(Boolean del) {
+        this.del = del;
     }
 
     @Column(name = "user_id", nullable = false)
@@ -89,7 +89,7 @@ public class Permission {
         Permission that = (Permission) o;
 
         if (abstractFile != null ? !abstractFile.equals(that.abstractFile) : that.abstractFile != null) return false;
-        if (delete != null ? !delete.equals(that.delete) : that.delete != null) return false;
+        if (del != null ? !del.equals(that.del) : that.del != null) return false;
         if (read != null ? !read.equals(that.read) : that.read != null) return false;
         if (userID != null ? !userID.equals(that.userID) : that.userID != null) return false;
         if (write != null ? !write.equals(that.write) : that.write != null) return false;
@@ -102,7 +102,7 @@ public class Permission {
         int result = abstractFile != null ? abstractFile.hashCode() : 0;
         result = 31 * result + (read != null ? read.hashCode() : 0);
         result = 31 * result + (write != null ? write.hashCode() : 0);
-        result = 31 * result + (delete != null ? delete.hashCode() : 0);
+        result = 31 * result + (del != null ? del.hashCode() : 0);
         result = 31 * result + (userID != null ? userID.hashCode() : 0);
         return result;
     }

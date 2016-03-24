@@ -10,15 +10,12 @@ import java.util.List;
 public interface FileDAO {
     AbstractFile getFileByID(Long userID, long fileID);
 
-    List<AbstractFile> getFileByIDs(Long userID, List<Long> fileIDs);
-
     List<AbstractFile> getFilesByName(Long userID, String folderPath, String fileName);
 
     Folder getFolder(Long userID, long folderID);
 
     void saveOrUpdateFile(Long userID, AbstractFile file);
 
-    void saveOrUpdateFiles(Long userID, List<AbstractFile> files);
 
     int deleteFile(Long userID, long fileID);
 

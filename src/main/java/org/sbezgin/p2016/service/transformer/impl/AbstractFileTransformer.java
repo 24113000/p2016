@@ -36,7 +36,7 @@ public abstract class AbstractFileTransformer {
                 permissionDTO.setUserID(permission.getUserID());
                 permissionDTO.setFileDTO(dto);
 
-                permissionDTO.setDelete(permission.getDelete());
+                permissionDTO.setDelete(permission.getDel());
                 permissionDTO.setWrite(permission.getWrite());
                 permissionDTO.setRead(permission.getRead());
 
@@ -98,7 +98,7 @@ public abstract class AbstractFileTransformer {
         permission.setUserID(permissionDTO.getUserID());
         permission.setRead(permissionDTO.getRead());
         permission.setWrite(permissionDTO.getWrite());
-        permission.setDelete(permissionDTO.getDelete());
+        permission.setDel(permissionDTO.getDelete());
         permission.setAbstractFile(abstractFile);
     }
 }

@@ -7,8 +7,11 @@ import org.sbezgin.p2016.db.dto.PermissionDTO;
 import org.sbezgin.p2016.db.dto.UserDTO;
 import org.sbezgin.p2016.db.dto.file.AbstractFileDTO;
 import org.sbezgin.p2016.db.dto.file.FolderDTO;
+import org.sbezgin.p2016.db.dto.file.TextFileContentDTO;
 import org.sbezgin.p2016.db.dto.file.TextFileDTO;
 import org.sbezgin.p2016.service.UserService;
+import org.sbezgin.p2016.service.file.FileAccessDeniedException;
+import org.sbezgin.p2016.service.file.FileNotFoundException;
 import org.sbezgin.p2016.service.file.FileService;
 import org.sbezgin.p2016.service.impl.UserServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,6 +63,68 @@ public class FileServiceImplPermissionTest {
         testSetPermission();
         testUpdatePermission();
         testSetPermissionRecursively();
+
+        //negative scenario
+        testDeleteFileFromNotAccessibleFolder(userService);
+
+    }
+
+    private void testDeleteFileFromNotAccessibleFolder(UserServiceImpl userService) {
+        AbstractFileDTO testFile = fileService.getFilesByName("/ROOT", "Test File").get(0);
+        Long fileID = testFile.getId();
+
+        when(userService.getCurrentUser()).then(invocationOnMock -> {
+            UserDTO user = new UserDTO();
+            user.setId(77L);
+            return user;
+        });
+
+        try {
+            fileService.deleteFile(fileID, false);
+            fail();
+        } catch (FileNotFoundException e) {
+            assertTrue(true);
+        }
+
+
+        //try delete if user has access only for read
+        when(userService.getCurrentUser()).then(invocationOnMock -> {
+            UserDTO user = new UserDTO();
+            user.setId(1L);
+            return user;
+        });
+
+        PermissionDTO permissionDTO = new PermissionDTO();
+        permissionDTO.setDelete(false);
+        permissionDTO.setRead(true);
+        permissionDTO.setWrite(false);
+        permissionDTO.setUserID(77L);
+
+        fileService.setPermission(testFile, permissionDTO);
+
+        when(userService.getCurrentUser()).then(invocationOnMock -> {
+            UserDTO user = new UserDTO();
+            user.setId(77L);
+            return user;
+        });
+
+        try {
+            fileService.deleteFile(fileID, false);
+            fail();
+        } catch (FileAccessDeniedException e) {
+            assertTrue(true);
+        }
+
+        TextFileDTO fullTextFile = fileService.getFullTextFile(fileID);
+        TextFileContentDTO fileContent = new TextFileContentDTO();
+        fileContent.setData("Bla Bla Bla");
+        fullTextFile.setFileContent(fileContent);
+        try {
+            fileService.saveFile(fullTextFile);
+            fail();
+        } catch (FileAccessDeniedException e) {
+            assertTrue(true);
+        }
     }
 
     private void testUpdatePermission() {

@@ -130,7 +130,7 @@ public class FileServiceImpl implements FileService {
             if (!savedFile.getOwnerID().equals(currentUser.getId())) {
                 Permission permission = fileDAO.getUserFilePermission(savedFile.getId(), userID);
                 if (permission == null || !permission.getWrite()) {
-                    throw new FileAccessDeiniedException("User " + userID + " don't have access to file " + savedFile.getId());
+                    throw new FileAccessDeniedException("User " + userID + " don't have access to file " + savedFile.getId());
                 }
             }
 
@@ -253,9 +253,9 @@ public class FileServiceImpl implements FileService {
 
     private void checkDeletePermission(Long userID, AbstractFile file) {
         if (!file.getOwnerID().equals(userID)) {
-            Permission permission = fileDAO.getUserFilePermission(userID, file.getId());
-            if (permission == null || !permission.getDelete()) {
-                throw new FileAccessDeiniedException("User " + userID + " don't have access to file " + file.getId());
+            Permission permission = fileDAO.getUserFilePermission(file.getId(), userID);
+            if (permission == null || !permission.getDel()) {
+                throw new FileAccessDeniedException("User " + userID + " don't have access to file " + file.getId());
             }
         }
     }

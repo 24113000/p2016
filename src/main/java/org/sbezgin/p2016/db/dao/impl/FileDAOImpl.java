@@ -19,24 +19,28 @@ public class FileDAOImpl implements FileDAO {
     @Override
     public AbstractFile getFileByID(Long userID, long fileID) {
         Session session = getSession();
-        Query query = session.createQuery("from AbstractFile as file where file.ownerID = :ownerId and file.id = :fileId  ");
+        Query query = session.createQuery(
+                " select file " +
+                " from AbstractFile as file " +
+                " left join file.permissions as perm " +
+                " where (file.ownerID = :ownerId or (perm.userID = :userId and perm.read = true)) " +
+                " and file.id = :fileId  ");
         query.setParameter("ownerId", userID);
+        query.setParameter("userId", userID);
         query.setParameter("fileId", fileID);
         return (AbstractFile) query.uniqueResult();
     }
 
     @Override
-    public List<AbstractFile> getFileByIDs(Long userID, List<Long> fileIDs) {
-        Session session = getSession();
-        Query query = session.createQuery("from AbstractFile as file where file.ownerID = :ownerId and file.id = :fileId  ");
-        return query.list();
-    }
-
-    @Override
     public List<AbstractFile> getFilesByName(Long userID, String folderPath, String fileName) {
         Session session = getSession();
-        Query query = session.createQuery("from AbstractFile as file where file.ownerID = :ownerId and file.name = :fileName and file.path = :folderPath  ");
+        Query query = session.createQuery(
+                " select file " +
+                " from AbstractFile as file " +
+                " left join file.permissions as perm " +
+                " where (file.ownerID = :ownerId or (perm.userID = :userId and perm.read = true)) and file.name = :fileName and file.path = :folderPath ");
         query.setParameter("ownerId", userID);
+        query.setParameter("userId", userID);
         query.setParameter("fileName", fileName);
         query.setParameter("folderPath", folderPath);
         return query.list();
@@ -59,15 +63,16 @@ public class FileDAOImpl implements FileDAO {
     }
 
     @Override
-    public void saveOrUpdateFiles(Long userID, List<AbstractFile> files) {
-
-    }
-
-    @Override
     public int deleteFile(Long userID, long fileID) {
         Session session = getSession();
-        Query query = session.createQuery("delete from AbstractFile as file where file.ownerID = :ownerId and file.id = :fileId ");
+        Query query = session.createQuery(
+                " delete from AbstractFile as file " +
+                " where file.id = :fileId and (file.ownerID = :ownerId or ( exists ( " +
+                "       from Permission as perm "+
+                "       where perm.userID = :userId and perm.del = true and perm.abstractFile.id = :fileId " +
+                " )))");
         query.setParameter("ownerId", userID);
+        query.setParameter("userId", userID);
         query.setParameter("fileId", fileID);
         return query.executeUpdate();
     }
@@ -75,16 +80,21 @@ public class FileDAOImpl implements FileDAO {
     @Override
     public List<AbstractFile> getRootFiles(Long ownerID) {
         Session session = getSession();
-        Query query = session.createQuery("from AbstractFile as file where file.ownerID = :ownerId and file.parentId is null ");
-        query.setParameter("ownerId", ownerID);
+        Query query = session.createQuery("from AbstractFile as file where file.parentId is null ");
         return query.list();
     }
 
     @Override
     public List<AbstractFile> getChildren(Long userID, long folderID, int start, int end) {
         Session session = getSession();
-        Query query = session.createQuery("from AbstractFile as file where file.ownerID = :ownerId and file.parentId = :folderID ");
+        Query query = session.createQuery(
+                " select file " +
+                " from AbstractFile as file " +
+                " left join file.permissions as perm " +
+                " where (file.ownerID = :ownerId or (perm.userID = :userId and perm.read = true)) and file.parentId = :folderID "
+        );
         query.setParameter("ownerId", userID);
+        query.setParameter("userId", userID);
         query.setParameter("folderID", folderID);
         return query.list();
     }
@@ -92,8 +102,14 @@ public class FileDAOImpl implements FileDAO {
     @Override
     public List<AbstractFile> getFilesByIDs(Long userID, List<Long> idList) {
         Session session = getSession();
-        Query query = session.createQuery("from AbstractFile as file where file.ownerID = :ownerId and file.id in :fileIds");
+        Query query = session.createQuery(
+                " select file " +
+                " from AbstractFile as file " +
+                " left join file.permissions as perm " +
+                " where (file.ownerID = :ownerId or (perm.userID = :userId and perm.read = true)) and file.id in :fileIds "
+        );
         query.setParameter("ownerId", userID);
+        query.setParameter("userId", userID);
         query.setParameterList("fileIds", idList);
         return query.list();
     }
@@ -101,8 +117,13 @@ public class FileDAOImpl implements FileDAO {
     @Override
     public List<AbstractFile> getAllChildren(Long userId, long fileID) {
         Session session = getSession();
-        Query query = session.createQuery("from AbstractFile as file where file.ownerID = :ownerId and (file.idPath like :likeexp or file.idPath like :likeexp2) ");
+        Query query = session.createQuery(
+                " select file " +
+                " from AbstractFile as file " +
+                " left join file.permissions as perm " +
+                " where (file.ownerID = :ownerId or (perm.userID = :userId and perm.read = true)) and (file.idPath like :likeexp or file.idPath like :likeexp2) ");
         query.setParameter("ownerId", userId);
+        query.setParameter("userId", userId);
         query.setParameter("likeexp", "%/" + fileID + "/%");
         query.setParameter("likeexp2", "%/" + fileID);
         return query.list();

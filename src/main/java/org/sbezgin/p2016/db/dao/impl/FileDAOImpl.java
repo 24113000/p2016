@@ -4,12 +4,14 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.sbezgin.p2016.db.dao.FileDAO;
+import org.sbezgin.p2016.db.dto.UserDTO;
 import org.sbezgin.p2016.db.entity.Permission;
 import org.sbezgin.p2016.db.entity.file.AbstractFile;
 import org.sbezgin.p2016.db.entity.file.Folder;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Iterator;
 import java.util.List;
 
 public class FileDAOImpl implements FileDAO {
@@ -137,6 +139,25 @@ public class FileDAOImpl implements FileDAO {
         query.setParameter("fileID", fileID);
 
         return (Permission) query.uniqueResult();
+    }
+
+    @Override
+    public void removePermission(Long fileID, Long userId) {
+        Session session = getSession();
+        AbstractFile file = session.get(AbstractFile.class, fileID);
+        if (file != null) {
+            List<Permission> permissions = file.getPermissions();
+            Iterator<Permission> iterator = permissions.iterator();
+            while (iterator.hasNext()) {
+                Permission next = iterator.next();
+                if (next.getUserID().equals(userId)) {
+                    iterator.remove();
+                }
+            }
+            session.save(file);
+        } else {
+            //TODO warn file not found !!!
+        }
     }
 
     private Session getSession() {

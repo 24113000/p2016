@@ -16,7 +16,6 @@ public interface FileDAO {
 
     void saveOrUpdateFile(Long userID, AbstractFile file);
 
-
     int deleteFile(Long userID, long fileID);
 
     List<AbstractFile> getRootFiles(Long ownerID);
@@ -28,4 +27,6 @@ public interface FileDAO {
     List<AbstractFile> getAllChildren(Long currentUserId, long fileID);
 
     Permission getUserFilePermission(Long fileID, Long useID);
+
+    void removePermission(Long fileID, Long userId);
 }

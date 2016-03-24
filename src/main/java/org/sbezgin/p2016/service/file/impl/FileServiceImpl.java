@@ -151,10 +151,46 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
+    @Transactional(propagation = Propagation.REQUIRED)
+    public void removePermission(AbstractFileDTO fileDTO, UserDTO userDTO) {
+        UserDTO currentUser = userService.getCurrentUser();
+        AbstractFile file = fileDAO.getFileByID(currentUser.getId(), fileDTO.getId());
+        if (file != null) {
+            if (isUserOwner(file)) {
+                fileDAO.removePermission(fileDTO.getId(), userDTO.getId());
+                return;
+            } else {
+                throw new FileAccessDeniedException("User is not owner ");
+            }
+        }
+        throw new FileNotFoundException("Cannot find a file: " + fileDTO.getId());
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED)
+    public void removeFolderPermissionRecursively(FolderDTO folderDTO, UserDTO userDTO) {
+        UserDTO currentUser = userService.getCurrentUser();
+        removePermission(folderDTO, userDTO);
+        List<AbstractFile> children = fileDAO.getAllChildren(currentUser.getId(), folderDTO.getId());
+        //TODO check if user has permission on all children
+        for (AbstractFile child : children) {
+            fileDAO.removePermission(child.getId(), userDTO.getId());
+        }
+    }
+
+
+    private boolean isUserOwner(AbstractFile file) {
+        UserDTO currentUser = userService.getCurrentUser();
+        return file.getOwnerID().equals(currentUser.getId());
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED)
     public void setFolderPermissionRecursively(FolderDTO folderDTO, PermissionDTO permDTO) {
         UserDTO currentUser = userService.getCurrentUser();
         setPermission(folderDTO, permDTO);
         List<AbstractFile> children = fileDAO.getAllChildren(currentUser.getId(), folderDTO.getId());
+        //TODO check if user has permission on all children
         for (AbstractFile child : children) {
 
             AbstractFileTransformer fileTransformer = (AbstractFileTransformer) getTransformer(child);
@@ -308,6 +344,7 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
+    @Transactional(propagation = Propagation.REQUIRED)
     public TextFileDTO getFullTextFile(long fileID) {
         UserDTO currentUser = userService.getCurrentUser();
         AbstractFile textFile = fileDAO.getFileByID(currentUser.getId(), fileID);

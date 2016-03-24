@@ -20,7 +20,11 @@ public interface FileService {
 
     void setPermission(AbstractFileDTO fileDTO, PermissionDTO perm);
 
+    void removePermission(AbstractFileDTO fileDTO, UserDTO userDTO);
+
     void setFolderPermissionRecursively(FolderDTO folderDTO, PermissionDTO perm);
+
+    void removeFolderPermissionRecursively(FolderDTO folderDTO, UserDTO userDTO);
 
     void renameFile(long fileID, String newName);
 

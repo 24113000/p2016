@@ -71,7 +71,7 @@ public class Permission {
         this.userID = userID;
     }
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.DETACH)
     @JoinColumn(name = "file_id", nullable = false)
     public AbstractFile getAbstractFile() {
         return abstractFile;

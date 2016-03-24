@@ -21,6 +21,7 @@ import org.springframework.test.context.ContextHierarchy;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -65,11 +66,82 @@ public class FileServiceImplPermissionTest {
         testSetPermissionRecursively();
 
         //negative scenario
-        testDeleteFileFromNotAccessibleFolder(userService);
-
+        testDeleteFileFromNotAccessibleFile(userService);
+        testReadFromNNotAccessibleFolder(userService);
     }
 
-    private void testDeleteFileFromNotAccessibleFolder(UserServiceImpl userService) {
+    private void testReadFromNNotAccessibleFolder(UserServiceImpl userService) {
+
+        when(userService.getCurrentUser()).then(invocationOnMock -> {
+            UserDTO user = new UserDTO();
+            user.setId(1L);
+            return user;
+        });
+
+        FolderDTO rootFolder = fileService.getRootFolder();
+        FolderDTO firstFolder = new FolderDTO();
+        firstFolder.setName("Folder_1");
+        firstFolder.setParentId(rootFolder.getId());
+        fileService.saveFile(firstFolder);
+
+        commitAndStartTransaction();
+
+        firstFolder = (FolderDTO) fileService.getFilesByName("/ROOT", "Folder_1").get(0);
+        TextFileDTO textFileDTO = new TextFileDTO();
+        textFileDTO.setName("Test File");
+        textFileDTO.setType(FileType.JSON);
+        textFileDTO.setParentId(firstFolder.getId());
+
+        fileService.saveFile(textFileDTO);
+
+        commitAndStartTransaction();
+
+        PermissionDTO permissionDTO = new PermissionDTO();
+        permissionDTO.setRead(true);
+        permissionDTO.setUserID(77L);
+
+        fileService.setFolderPermissionRecursively(firstFolder, permissionDTO);
+
+        commitAndStartTransaction();
+
+        AbstractFileDTO testFile = fileService.getFilesByName("/ROOT/Folder_1", "Test File").get(0);
+
+        //switch to another user
+        when(userService.getCurrentUser()).then(invocationOnMock -> {
+            UserDTO user = new UserDTO();
+            user.setId(77L);
+            return user;
+        });
+
+        List<AbstractFileDTO> children = fileService.getChildren(firstFolder.getId(), 0, 50);
+        assertEquals(1, children.size());
+        assertEquals(testFile, children.get(0));
+
+        //switch to another user
+        when(userService.getCurrentUser()).then(invocationOnMock -> {
+            UserDTO user = new UserDTO();
+            user.setId(1L);
+            return user;
+        });
+
+        UserDTO user_ = new UserDTO();
+        user_.setId(77L);
+        fileService.removeFolderPermissionRecursively(firstFolder, user_);
+
+        commitAndStartTransaction();
+
+        //switch to another user
+        when(userService.getCurrentUser()).then(invocationOnMock -> {
+            UserDTO user = new UserDTO();
+            user.setId(77L);
+            return user;
+        });
+
+        children = fileService.getChildren(firstFolder.getId(), 0, 50);
+        assertEquals(0, children.size());
+    }
+
+    private void testDeleteFileFromNotAccessibleFile(UserServiceImpl userService) {
         AbstractFileDTO testFile = fileService.getFilesByName("/ROOT", "Test File").get(0);
         Long fileID = testFile.getId();
 

@@ -204,9 +204,12 @@ public class FileServiceImplNegativeTest {
     }
 
     private void testGetChildrenFolderByIncorrectID() {
-        List<AbstractFileDTO> children = fileService.getChildren(777, 0, 10);
-        assertNotNull(children);
-        assertEquals(0, children.size());
+        try {
+            fileService.getChildren(777, 0, 10);
+            fail();
+        } catch (FileNotFoundException e) {
+            assertTrue(true);
+        }
     }
 
     private void testFolderByIncorrectID() {

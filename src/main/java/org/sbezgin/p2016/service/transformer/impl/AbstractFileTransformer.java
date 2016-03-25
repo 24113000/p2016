@@ -65,8 +65,11 @@ public abstract class AbstractFileTransformer {
         dest.setUpdateDate(src.getUpdateDate());
 
         if (CollectionUtils.isNotEmpty(src.getPermissionDTOs())){
-            List<Permission> permissions = new ArrayList<>();
             List<Permission> entityPermissions = dest.getPermissions();
+            if (entityPermissions == null) {
+                entityPermissions = new ArrayList<>();
+                dest.setPermissions(entityPermissions);
+            }
             if (CollectionUtils.isNotEmpty(entityPermissions)) {
                 Map<Long, Permission> permissionMap = new HashMap<>(entityPermissions.size());
                 for (Permission entityPermission : entityPermissions) {
@@ -79,16 +82,15 @@ public abstract class AbstractFileTransformer {
                         permission = new Permission();
                     }
                     copyPermissionDTOToEntity(permissionDTO, permission, dest);
-                    permissions.add(permission);
+                    entityPermissions.add(permission);
                 }
             } else {
                 for (PermissionDTO permissionDTO : src.getPermissionDTOs()) {
                     Permission permission = new Permission();
                     copyPermissionDTOToEntity(permissionDTO, permission, dest);
-                    permissions.add(permission);
+                    entityPermissions.add(permission);
                 }
             }
-            dest.setPermissions(permissions);
         }
     }
 

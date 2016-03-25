@@ -29,4 +29,6 @@ public interface FileDAO {
     Permission getUserFilePermission(Long fileID, Long useID);
 
     void removePermission(Long fileID, Long userId);
+
+    List<AbstractFile> getUnsecuredAllChildren(long fileID);
 }

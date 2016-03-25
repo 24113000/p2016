@@ -169,12 +169,22 @@ public class FileServiceImpl implements FileService {
     @Override
     @Transactional(propagation = Propagation.REQUIRED)
     public void removeFolderPermissionRecursively(FolderDTO folderDTO, UserDTO userDTO) {
-        UserDTO currentUser = userService.getCurrentUser();
         removePermission(folderDTO, userDTO);
-        List<AbstractFile> children = fileDAO.getAllChildren(currentUser.getId(), folderDTO.getId());
-        //TODO check if user has permission on all children
+        List<AbstractFile> children = fileDAO.getUnsecuredAllChildren(folderDTO.getId());
+
+        for (AbstractFile child : children) {
+            checkIfUserOwner(child);
+        }
+
         for (AbstractFile child : children) {
             fileDAO.removePermission(child.getId(), userDTO.getId());
+        }
+    }
+
+    private void checkIfUserOwner(AbstractFile child) {
+        UserDTO currentUser = userService.getCurrentUser();
+        if (!child.getOwnerID().equals(currentUser.getId())) {
+            throw new FileAccessDeniedException("User " + currentUser.getId() +  " is owner of file " + child.getId());
         }
     }
 
@@ -189,8 +199,12 @@ public class FileServiceImpl implements FileService {
     public void setFolderPermissionRecursively(FolderDTO folderDTO, PermissionDTO permDTO) {
         UserDTO currentUser = userService.getCurrentUser();
         setPermission(folderDTO, permDTO);
-        List<AbstractFile> children = fileDAO.getAllChildren(currentUser.getId(), folderDTO.getId());
-        //TODO check if user has permission on all children
+        List<AbstractFile> children = fileDAO.getUnsecuredAllChildren(folderDTO.getId());
+
+        for (AbstractFile child : children) {
+            isUserOwner(child);
+        }
+
         for (AbstractFile child : children) {
 
             AbstractFileTransformer fileTransformer = (AbstractFileTransformer) getTransformer(child);
@@ -245,7 +259,7 @@ public class FileServiceImpl implements FileService {
         }
 
         if (recursively) {
-            List<AbstractFile> children = fileDAO.getAllChildren(currentUser.getId(), fileID);
+            List<AbstractFile> children = fileDAO.getUnsecuredAllChildren(fileID);
             children.sort((o1, o2) -> {
                         if (o1.getIdPath().split("/").length < o2.getIdPath().split("/").length) {
                             return 1;
@@ -256,15 +270,16 @@ public class FileServiceImpl implements FileService {
                         }
                     }
             );
+
             for (AbstractFile child : children) {
-
                 checkDeletePermission(currentUser.getId(), child);
+            }
 
+            for (AbstractFile child : children) {
                 int childResult = fileDAO.deleteFile(currentUser.getId(), child.getId());
                 if (childResult != 1) {
                     throw new FileNotFoundException("Cannot delete file with id: " + child.getId());
                 }
-
             }
 
             checkDeletePermission(currentUser.getId(), file);
@@ -290,7 +305,7 @@ public class FileServiceImpl implements FileService {
     private void checkDeletePermission(Long userID, AbstractFile file) {
         if (!file.getOwnerID().equals(userID)) {
             Permission permission = fileDAO.getUserFilePermission(file.getId(), userID);
-            if (permission == null || !permission.getDel()) {
+            if (permission == null || permission.getDel() == null || !permission.getDel()) {
                 throw new FileAccessDeniedException("User " + userID + " don't have access to file " + file.getId());
             }
         }
@@ -324,18 +339,24 @@ public class FileServiceImpl implements FileService {
     public List<AbstractFileDTO> getChildren(long folderID, int start, int end) {
         UserDTO currentUser = userService.getCurrentUser();
 
-        List<AbstractFile> children = fileDAO.getChildren(currentUser.getId(), folderID, start, end);
-        List<AbstractFileDTO> result = new ArrayList<>(children.size());
-        result.addAll(
-                children.stream().map(
-                        child -> {
-                            BeanTransformer beanTransformer = getTransformer(child);
-                            return (AbstractFileDTO) beanTransformer.transformEntityToDTO(child);
-                        }
-                ).collect(Collectors.toList())
-        );
+        AbstractFile fileByID = fileDAO.getFileByID(currentUser.getId(), folderID);
 
-        return result;
+        if (fileByID != null) {
+            List<AbstractFile> children = fileDAO.getChildren(currentUser.getId(), folderID, start, end);
+            List<AbstractFileDTO> result = new ArrayList<>(children.size());
+            result.addAll(
+                    children.stream().map(
+                            child -> {
+                                BeanTransformer beanTransformer = getTransformer(child);
+                                return (AbstractFileDTO) beanTransformer.transformEntityToDTO(child);
+                            }
+                    ).collect(Collectors.toList())
+            );
+
+            return result;
+        }
+
+        throw new FileNotFoundException("Cannot find a file: " + folderID);
     }
 
     @Override

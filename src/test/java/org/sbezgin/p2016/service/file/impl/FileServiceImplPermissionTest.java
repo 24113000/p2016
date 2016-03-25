@@ -21,7 +21,6 @@ import org.springframework.test.context.ContextHierarchy;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -68,6 +67,63 @@ public class FileServiceImplPermissionTest {
         //negative scenario
         testDeleteFileFromNotAccessibleFile(userService);
         testReadFromNNotAccessibleFolder(userService);
+        testDeleteRecursivelyIfUserDontHaveAccessOnChildren(userService);
+    }
+
+    private void testDeleteRecursivelyIfUserDontHaveAccessOnChildren(UserServiceImpl userService) {
+        when(userService.getCurrentUser()).then(invocationOnMock -> {
+            UserDTO user = new UserDTO();
+            user.setId(1L);
+            return user;
+        });
+
+        FolderDTO firstFolder = (FolderDTO) fileService.getFilesByName("/ROOT", "Folder_1").get(0);
+
+        FolderDTO secondFolder = new FolderDTO();
+        secondFolder.setName("Folder_2");
+        secondFolder.setParentId(firstFolder.getId());
+        fileService.saveFile(secondFolder);
+
+        commitAndStartTransaction();
+
+        TextFileDTO textFileDTO2 = new TextFileDTO();
+        textFileDTO2.setName("TestFile2");
+        textFileDTO2.setType(FileType.JSON);
+        textFileDTO2.setParentId(firstFolder.getId());
+
+        fileService.saveFile(secondFolder);
+
+        AbstractFileDTO testFile = fileService.getFilesByName("/ROOT/Folder_1", "Test File").get(0);
+        fileService.deleteFile(testFile.getId(), false);
+
+        commitAndStartTransaction();
+
+        PermissionDTO permissionDTO = new PermissionDTO();
+        permissionDTO.setUserID(77L);
+        permissionDTO.setRead(true);
+        permissionDTO.setWrite(true);
+        permissionDTO.setDelete(true);
+
+        secondFolder = (FolderDTO) fileService.getFilesByName("/ROOT/Folder_1", "Folder_2").get(0);
+        fileService.setPermission(firstFolder, permissionDTO);
+        fileService.setPermission(secondFolder, permissionDTO);
+
+
+
+        commitAndStartTransaction();
+
+        when(userService.getCurrentUser()).then(invocationOnMock -> {
+            UserDTO user = new UserDTO();
+            user.setId(77L);
+            return user;
+        });
+
+        try {
+            fileService.deleteFile(firstFolder.getId(), true);
+            fail();
+        } catch (FileAccessDeniedException e) {
+            assertTrue(true);
+        }
     }
 
     private void testReadFromNNotAccessibleFolder(UserServiceImpl userService) {
@@ -137,8 +193,12 @@ public class FileServiceImplPermissionTest {
             return user;
         });
 
-        children = fileService.getChildren(firstFolder.getId(), 0, 50);
-        assertEquals(0, children.size());
+        try {
+            fileService.getChildren(firstFolder.getId(), 0, 50);
+            fail();
+        } catch (FileNotFoundException e) {
+            assertTrue(true);
+        }
     }
 
     private void testDeleteFileFromNotAccessibleFile(UserServiceImpl userService) {

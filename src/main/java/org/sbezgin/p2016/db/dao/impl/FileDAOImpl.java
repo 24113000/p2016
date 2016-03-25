@@ -4,7 +4,6 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.sbezgin.p2016.db.dao.FileDAO;
-import org.sbezgin.p2016.db.dto.UserDTO;
 import org.sbezgin.p2016.db.entity.Permission;
 import org.sbezgin.p2016.db.entity.file.AbstractFile;
 import org.sbezgin.p2016.db.entity.file.Folder;
@@ -130,6 +129,18 @@ public class FileDAOImpl implements FileDAO {
         query.setParameter("likeexp2", "%/" + fileID);
         return query.list();
     }
+
+    @Override
+    public List<AbstractFile> getUnsecuredAllChildren(long fileID) {
+        Session session = getSession();
+        Query query = session.createQuery(
+                        " from AbstractFile as file " +
+                        " where file.idPath like :likeexp or file.idPath like :likeexp2 ");
+        query.setParameter("likeexp", "%/" + fileID + "/%");
+        query.setParameter("likeexp2", "%/" + fileID);
+        return query.list();
+    }
+
 
     @Override
     public Permission getUserFilePermission(Long fileID, Long useID) {

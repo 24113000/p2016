@@ -7,6 +7,7 @@ import org.sbezgin.p2016.db.dto.file.FolderDTO;
 import org.sbezgin.p2016.db.dto.file.TextFileDTO;
 import org.sbezgin.p2016.db.entity.Permission;
 
+import java.util.Date;
 import java.util.List;
 
 public interface FileService {
@@ -18,7 +19,9 @@ public interface FileService {
 
     void saveFile(AbstractFileDTO file);
 
-    void setPermission(AbstractFileDTO fileDTO, PermissionDTO perm);
+    void saveFile(AbstractFileDTO file, Date lastUpdate);
+
+    void savePermission(AbstractFileDTO fileDTO, PermissionDTO perm);
 
     void removePermission(AbstractFileDTO fileDTO, UserDTO userDTO);
 
@@ -38,7 +41,7 @@ public interface FileService {
 
     TextFileDTO getFullTextFile(long fileID);
 
-    PermissionDTO getUserFilePermission(AbstractFileDTO fileDTO, UserDTO userDTO);
+    PermissionDTO getUserFilePermission(AbstractFileDTO fileDTO, Long userID);
 
     PermissionDTO getCurrentUserFilePermission(AbstractFileDTO fileDTO);
 }

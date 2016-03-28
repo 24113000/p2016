@@ -143,10 +143,10 @@ public class FileDAOImpl implements FileDAO {
 
 
     @Override
-    public Permission getUserFilePermission(Long fileID, Long useID) {
+    public Permission getUserFilePermission(Long fileID, Long userID) {
         Session session = getSession();
         Query query = session.createQuery(" from Permission as perm where perm.abstractFile.id = :fileID and userID = :userID ");
-        query.setParameter("userID", useID);
+        query.setParameter("userID", userID);
         query.setParameter("fileID", fileID);
 
         return (Permission) query.uniqueResult();

@@ -76,6 +76,12 @@ public class FileServiceImpl implements FileService {
     @Transactional(propagation = Propagation.REQUIRED)
     @Override
     public void saveFile(AbstractFileDTO file) {
+        saveFile(file, null);
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED)
+    @Override
+    public void saveFile(AbstractFileDTO file, Date lastUpdate) {
         UserDTO currentUser = userService.getCurrentUser();
         Long id = file.getId();
         Long userID = currentUser.getId();
@@ -123,9 +129,12 @@ public class FileServiceImpl implements FileService {
             fileDAO.saveOrUpdateFile(userID, fileEntity);
         } else {
             AbstractFile savedFile = fileDAO.getFileByID(userID, file.getId());
+
             if (savedFile == null) {
                 throw new FileNotFoundException("Cannot get file " + file.getName() + " by id " + file.getId());
             }
+
+            compareUpdateDate(file, lastUpdate, savedFile);
 
             if (!savedFile.getOwnerID().equals(currentUser.getId())) {
                 Permission permission = fileDAO.getUserFilePermission(savedFile.getId(), userID);
@@ -142,12 +151,46 @@ public class FileServiceImpl implements FileService {
         }
     }
 
+    private void compareUpdateDate(AbstractFileDTO file, Date lastUpdate, AbstractFile savedFile) {
+        Date checkDate;
+        if (lastUpdate != null) {
+            checkDate = lastUpdate;
+        } else {
+            checkDate = file.getUpdateDate();
+        }
+
+        if (checkDate != null && !savedFile.getUpdateDate().equals(checkDate)) {
+            throw new FileChangedException("File has been changed ID " + savedFile.getId());
+        }
+    }
+
     @Override
     @Transactional(propagation = Propagation.REQUIRED)
-    public void setPermission(AbstractFileDTO fileDTO, PermissionDTO perm) {
-        perm.setFileDTO(fileDTO);
-        fileDTO.getPermissionDTOs().add(perm);
-        saveFile(fileDTO);
+    public void savePermission(AbstractFileDTO fileDTO, PermissionDTO perm) {
+        UserDTO currentUser = userService.getCurrentUser();
+        AbstractFile savedFile = fileDAO.getFileByID(currentUser.getId(), fileDTO.getId());
+
+        if (savedFile == null) {
+            throw new FileNotFoundException("File not found id " + fileDTO.getId());
+        }
+
+        if (!isUserOwner(savedFile)) {
+            throw new FileAccessDeniedException("Access denied for file " + savedFile.getId());
+        }
+
+        Permission permissionForUser = getPermissionForUser(savedFile.getPermissions(), perm.getUserID());
+
+        AbstractFileTransformer fileTransformer = (AbstractFileTransformer) getTransformer(savedFile);
+
+        if (permissionForUser == null) {
+            perm.setFileDTO(fileDTO);
+            fileDTO.getPermissionDTOs().add(perm);
+            saveFile(fileDTO);
+        } else {
+            fileTransformer.copyPermissionDTOToEntity(perm, permissionForUser, savedFile);
+            savedFile.getPermissions().add(permissionForUser);
+            fileDAO.saveOrUpdateFile(currentUser.getId(), savedFile);
+        }
     }
 
     @Override
@@ -198,7 +241,7 @@ public class FileServiceImpl implements FileService {
     @Transactional(propagation = Propagation.REQUIRED)
     public void setFolderPermissionRecursively(FolderDTO folderDTO, PermissionDTO permDTO) {
         UserDTO currentUser = userService.getCurrentUser();
-        setPermission(folderDTO, permDTO);
+        savePermission(folderDTO, permDTO);
         List<AbstractFile> children = fileDAO.getUnsecuredAllChildren(folderDTO.getId());
 
         for (AbstractFile child : children) {
@@ -374,8 +417,8 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    public PermissionDTO getUserFilePermission(AbstractFileDTO fileDTO, UserDTO userDTO) {
-        Permission permission = fileDAO.getUserFilePermission(fileDTO.getId(), userDTO.getId());
+    public PermissionDTO getUserFilePermission(AbstractFileDTO fileDTO, Long userID) {
+        Permission permission = fileDAO.getUserFilePermission(fileDTO.getId(), userID);
         if (permission != null) {
             BeanTransformer beanTransformer = getTransformer(permission);
             return (PermissionDTO) beanTransformer.transformEntityToDTO(permission);
@@ -386,7 +429,7 @@ public class FileServiceImpl implements FileService {
     @Override
     public PermissionDTO getCurrentUserFilePermission(AbstractFileDTO fileDTO) {
         UserDTO currentUser = userService.getCurrentUser();
-        return getUserFilePermission(fileDTO, currentUser);
+        return getUserFilePermission(fileDTO, currentUser.getId());
     }
 
     public FileDAO getFileDAO() {

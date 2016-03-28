@@ -11,6 +11,7 @@ import org.sbezgin.p2016.db.dto.file.TextFileContentDTO;
 import org.sbezgin.p2016.db.dto.file.TextFileDTO;
 import org.sbezgin.p2016.service.UserService;
 import org.sbezgin.p2016.service.file.FileAccessDeniedException;
+import org.sbezgin.p2016.service.file.FileChangedException;
 import org.sbezgin.p2016.service.file.FileNotFoundException;
 import org.sbezgin.p2016.service.file.FileService;
 import org.sbezgin.p2016.service.impl.UserServiceImpl;
@@ -68,6 +69,55 @@ public class FileServiceImplPermissionTest {
         testDeleteFileFromNotAccessibleFile(userService);
         testReadFromNNotAccessibleFolder(userService);
         testDeleteRecursivelyIfUserDontHaveAccessOnChildren(userService);
+        testUpdatingSharedFile(userService);
+    }
+
+    private void testUpdatingSharedFile(UserServiceImpl userService) {
+        when(userService.getCurrentUser()).then(invocationOnMock -> {
+            UserDTO user = new UserDTO();
+            user.setId(1L);
+            return user;
+        });
+
+        AbstractFileDTO firstUserFileDTO = fileService.getFilesByName("/ROOT", "Test File").get(0);
+
+        PermissionDTO perm = new PermissionDTO();
+        perm.setWrite(true);
+        perm.setRead(true);
+        perm.setUserID(77L);
+
+        fileService.savePermission(firstUserFileDTO, perm);
+
+        commitAndStartTransaction();
+
+        when(userService.getCurrentUser()).then(invocationOnMock -> {
+            UserDTO user = new UserDTO();
+            user.setId(77L);
+            return user;
+        });
+
+        TextFileDTO secondUserFullTextFile = fileService.getFullTextFile(firstUserFileDTO.getId());
+        TextFileContentDTO fileContent = secondUserFullTextFile.getFileContent();
+        if (fileContent == null) {
+            fileContent = new TextFileContentDTO();
+        }
+        fileContent.setData("111112");
+        fileService.saveFile(secondUserFullTextFile);
+
+        commitAndStartTransaction();
+
+        when(userService.getCurrentUser()).then(invocationOnMock -> {
+            UserDTO user = new UserDTO();
+            user.setId(1L);
+            return user;
+        });
+
+        try {
+            fileService.saveFile(firstUserFileDTO);
+            fail();
+        } catch (FileChangedException e) {
+            assertTrue(true);
+        }
     }
 
     private void testDeleteRecursivelyIfUserDontHaveAccessOnChildren(UserServiceImpl userService) {
@@ -105,8 +155,8 @@ public class FileServiceImplPermissionTest {
         permissionDTO.setDelete(true);
 
         secondFolder = (FolderDTO) fileService.getFilesByName("/ROOT/Folder_1", "Folder_2").get(0);
-        fileService.setPermission(firstFolder, permissionDTO);
-        fileService.setPermission(secondFolder, permissionDTO);
+        fileService.savePermission(firstFolder, permissionDTO);
+        fileService.savePermission(secondFolder, permissionDTO);
 
 
 
@@ -232,7 +282,7 @@ public class FileServiceImplPermissionTest {
         permissionDTO.setWrite(false);
         permissionDTO.setUserID(77L);
 
-        fileService.setPermission(testFile, permissionDTO);
+        fileService.savePermission(testFile, permissionDTO);
 
         when(userService.getCurrentUser()).then(invocationOnMock -> {
             UserDTO user = new UserDTO();
@@ -373,7 +423,7 @@ public class FileServiceImplPermissionTest {
         permissionDTO.setRead(true);
         permissionDTO.setDelete(true);
 
-        fileService.setPermission(file, permissionDTO);
+        fileService.savePermission(file, permissionDTO);
         commitAndStartTransaction();
 
         AbstractFileDTO fileDTO = fileService.getFileByID(file.getId());

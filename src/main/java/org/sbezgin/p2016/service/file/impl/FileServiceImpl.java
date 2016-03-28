@@ -245,7 +245,7 @@ public class FileServiceImpl implements FileService {
         List<AbstractFile> children = fileDAO.getUnsecuredAllChildren(folderDTO.getId());
 
         for (AbstractFile child : children) {
-            isUserOwner(child);
+            checkIfUserOwner(child);
         }
 
         for (AbstractFile child : children) {
@@ -294,7 +294,7 @@ public class FileServiceImpl implements FileService {
     @Transactional(propagation = Propagation.REQUIRED)
     public void deleteFile(long fileID, boolean recursively) {
         UserDTO currentUser = userService.getCurrentUser();
-        int result;
+        boolean result;
         AbstractFile file = fileDAO.getFileByID(currentUser.getId(), fileID);
 
         if (file == null) {
@@ -319,15 +319,15 @@ public class FileServiceImpl implements FileService {
             }
 
             for (AbstractFile child : children) {
-                int childResult = fileDAO.deleteFile(currentUser.getId(), child.getId());
-                if (childResult != 1) {
+                boolean childResult = fileDAO.deleteFile(currentUser.getId(), child.getId());
+                if (!childResult) {
                     throw new FileNotFoundException("Cannot delete file with id: " + child.getId());
                 }
             }
 
             checkDeletePermission(currentUser.getId(), file);
             result = fileDAO.deleteFile(currentUser.getId(), fileID);
-            if (result != 1) {
+            if (!result) {
                 throw new FileNotFoundException("Cannot delete file with id: " + fileID);
             }
         } else {
@@ -339,7 +339,7 @@ public class FileServiceImpl implements FileService {
             checkDeletePermission(currentUser.getId(), file);
 
             result = fileDAO.deleteFile(currentUser.getId(), fileID);
-            if (result != 1) {
+            if (!result) {
                 throw new FileNotFoundException("Cannot delete file with id: " + fileID);
             }
         }
@@ -357,18 +357,12 @@ public class FileServiceImpl implements FileService {
     @Override
     @Transactional(propagation = Propagation.REQUIRED)
     public FolderDTO getRootFolder() {
-        UserDTO currentUser = userService.getCurrentUser();
-        List<AbstractFile> rootFiles = fileDAO.getRootFiles(currentUser.getId());
+        AbstractFile rootFolder = fileDAO.getRootFolder();
 
-        if (rootFiles.size() == 0) {
+        if (rootFolder == null) {
             throw new FileNotFoundException("Root folder is missing ");
         }
 
-        if (rootFiles.size() > 1) {
-            throw new FileOperationException("Root folder should be unique");
-        }
-
-        AbstractFile rootFolder = rootFiles.get(0);
         BeanTransformer beanTransformer = getTransformer(rootFolder);
         return (FolderDTO) beanTransformer.transformEntityToDTO(rootFolder);
     }
@@ -412,6 +406,18 @@ public class FileServiceImpl implements FileService {
     public TextFileDTO getFullTextFile(long fileID) {
         UserDTO currentUser = userService.getCurrentUser();
         AbstractFile textFile = fileDAO.getFileByID(currentUser.getId(), fileID);
+
+        if (textFile == null) {
+            throw new FileNotFoundException("File not found id " + fileID);
+        }
+
+        if (!isUserOwner(textFile)) {
+            Permission perm = getPermissionForUser(textFile.getPermissions(), currentUser.getId());
+            if (perm == null || perm.getRead() == null || !perm.getRead()) {
+                throw new FileAccessDeniedException("Access denied for file " + fileID);
+            }
+        }
+
         TextFileTransformerImpl transformer = (TextFileTransformerImpl) beanTransformerHolder.getTransformer(textFile.getClassName());
         return transformer.transformEntityToDTO((TextFile) textFile, true);
     }

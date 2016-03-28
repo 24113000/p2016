@@ -64,18 +64,16 @@ public class FileDAOImpl implements FileDAO {
     }
 
     @Override
-    public int deleteFile(Long userID, long fileID) {
+    public boolean deleteFile(Long userID, long fileID) {
         Session session = getSession();
-        Query query = session.createQuery(
-                " delete from AbstractFile as file " +
-                " where file.id = :fileId and (file.ownerID = :ownerId or ( exists ( " +
-                "       from Permission as perm "+
-                "       where perm.userID = :userId and perm.del = true and perm.abstractFile.id = :fileId " +
-                " )))");
-        query.setParameter("ownerId", userID);
-        query.setParameter("userId", userID);
-        query.setParameter("fileId", fileID);
-        return query.executeUpdate();
+        AbstractFile fileByID = getFileByID(userID, fileID);
+        if (fileByID != null) {
+            session.delete(fileByID);
+            session.flush();
+            return true;
+        } else {
+            return false;
+        }
     }
 
     @Override
@@ -139,6 +137,15 @@ public class FileDAOImpl implements FileDAO {
         query.setParameter("likeexp", "%/" + fileID + "/%");
         query.setParameter("likeexp2", "%/" + fileID);
         return query.list();
+    }
+
+    @Override
+    public AbstractFile getRootFolder() {
+        Session session = getSession();
+        Query query = session.createQuery(
+                " from AbstractFile as file " +
+                        " where file.parentId is NULL AND file.name = 'ROOT' ");
+        return (AbstractFile) query.uniqueResult();
     }
 
 

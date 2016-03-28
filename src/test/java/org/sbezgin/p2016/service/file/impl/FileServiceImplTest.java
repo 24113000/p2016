@@ -59,6 +59,16 @@ public class FileServiceImplTest {
         testGetFolderByID();
         testDeleteCascade();
         testRenameFolder();
+        testGetROOTFolder(userService);
+    }
+
+    private void testGetROOTFolder(UserServiceImpl userService) {
+        when(userService.getCurrentUser()).then(invocationOnMock -> {
+            return null;
+        });
+        FolderDTO rootFolder = fileService.getRootFolder();
+        assertNotNull(rootFolder);
+        assertEquals("ROOT", rootFolder.getName());
     }
 
     private void testRenameFolder() {

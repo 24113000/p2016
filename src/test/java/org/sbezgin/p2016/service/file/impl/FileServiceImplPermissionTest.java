@@ -64,12 +64,128 @@ public class FileServiceImplPermissionTest {
         testSetPermission();
         testUpdatePermission();
         testSetPermissionRecursively();
+        testGetSharedFile(userService);
+        testUpdateSharedFile(userService);
+        testDeleteSharedFile(userService);
 
         //negative scenario
+        testReadNotSharedChilred(userService);
         testDeleteFileFromNotAccessibleFile(userService);
         testReadFromNNotAccessibleFolder(userService);
         testDeleteRecursivelyIfUserDontHaveAccessOnChildren(userService);
         testUpdatingSharedFile(userService);
+    }
+
+    private void testReadNotSharedChilred(UserServiceImpl userService) {
+        when(userService.getCurrentUser()).then(invocationOnMock -> {
+            UserDTO user = new UserDTO();
+            user.setId(1L);
+            return user;
+        });
+
+
+        FolderDTO secondFolder = (FolderDTO) fileService.getFilesByName("/ROOT/FirstFolder", "SecondFolder").get(0);
+        TextFileDTO deepFile = new TextFileDTO();
+        deepFile.setName("THE_FILE");
+        deepFile.setType(FileType.JSON);
+        deepFile.setParentId(secondFolder.getId());
+        fileService.saveFile(deepFile);
+
+        commitAndStartTransaction();
+
+        when(userService.getCurrentUser()).then(invocationOnMock -> {
+            Long user2ID = userIDs.get("blabla2@ukr.net");
+            UserDTO user = new UserDTO();
+            user.setId(user2ID);
+            return user;
+        });
+
+        List<AbstractFileDTO> children = fileService.getChildren(secondFolder.getId(), 0, 50);
+        assertEquals(0, children.size());
+    }
+
+    private void testDeleteSharedFile(UserServiceImpl userService) {
+        when(userService.getCurrentUser()).then(invocationOnMock -> {
+            UserDTO user = new UserDTO();
+            user.setId(1L);
+            return user;
+        });
+        Long user2ID = userIDs.get("blabla2@ukr.net");
+        PermissionDTO perm = new PermissionDTO();
+        perm.setRead(true);
+        perm.setWrite(true);
+        perm.setDelete(true);
+        perm.setUserID(user2ID);
+
+        AbstractFileDTO abstractFileDTO = fileService.getFilesByName("/ROOT/FirstFolder/SecondFolder", "THE_FILE").get(0);
+        fileService.savePermission(abstractFileDTO, perm);
+
+        commitAndStartTransaction();
+
+        when(userService.getCurrentUser()).then(invocationOnMock -> {
+            UserDTO user = new UserDTO();
+            user.setId(user2ID);
+            return user;
+        });
+
+        fileService.deleteFile(abstractFileDTO.getId(), false);
+
+        commitAndStartTransaction();
+
+        List<AbstractFileDTO> files = fileService.getFilesByName("/ROOT/FirstFolder/SecondFolder", "THE_FILE");
+        assertEquals(0, files.size());
+    }
+
+    private void testUpdateSharedFile(UserServiceImpl userService) {
+        when(userService.getCurrentUser()).then(invocationOnMock -> {
+            UserDTO user = new UserDTO();
+            user.setId(1L);
+            return user;
+        });
+        Long user2ID = userIDs.get("blabla2@ukr.net");
+        PermissionDTO perm = new PermissionDTO();
+        perm.setRead(true);
+        perm.setWrite(true);
+        perm.setUserID(user2ID);
+
+        AbstractFileDTO abstractFileDTO = fileService.getFilesByName("/ROOT/FirstFolder/SecondFolder", "THE_FILE").get(0);
+        fileService.savePermission(abstractFileDTO, perm);
+
+        commitAndStartTransaction();
+
+        when(userService.getCurrentUser()).then(invocationOnMock -> {
+            UserDTO user = new UserDTO();
+            user.setId(user2ID);
+            return user;
+        });
+
+        TextFileDTO fullTextFile = fileService.getFullTextFile(abstractFileDTO.getId());
+        TextFileContentDTO fileContent = fullTextFile.getFileContent();
+        if (fileContent == null) {
+            fileContent = new TextFileContentDTO();
+            fullTextFile.setFileContent(fileContent);
+        }
+        fileContent.setData("1111");
+
+        fileService.saveFile(fullTextFile);
+
+        commitAndStartTransaction();
+
+        TextFileDTO fullTextFile2 = fileService.getFullTextFile(abstractFileDTO.getId());
+        assertEquals(fileContent.getData(), fullTextFile2.getFileContent().getData());
+    }
+
+    private void testGetSharedFile(UserServiceImpl userService) {
+        when(userService.getCurrentUser()).then(invocationOnMock -> {
+            Long aLong = userIDs.get("blabla2@ukr.net");
+            UserDTO user = new UserDTO();
+            user.setId(aLong);
+            return user;
+        });
+
+        AbstractFileDTO abstractFileDTO = fileService.getFilesByName("/ROOT/FirstFolder", "SecondFolder").get(0);
+        assertNotNull(abstractFileDTO);
+        assertEquals("SecondFolder", abstractFileDTO.getName());
     }
 
     private void testUpdatingSharedFile(UserServiceImpl userService) {

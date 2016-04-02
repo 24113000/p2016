@@ -1,11 +1,13 @@
 package org.sbezgin.p2016.db.dto.file;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.sbezgin.p2016.db.dto.PermissionDTO;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+@JsonIgnoreProperties(value = { "permissionDTOs" })
 public abstract class AbstractFileDTO {
     private Long id;
     private String name;
@@ -15,7 +17,7 @@ public abstract class AbstractFileDTO {
     private Date createDate;
     private Date updateDate;
 
-    private List<PermissionDTO> permissionDTOs = new ArrayList<>(5);
+    private List<PermissionDTO> permissionDTOs = new ArrayList<>();
 
     public Long getId() {
         return id;

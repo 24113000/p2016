@@ -184,7 +184,7 @@ public class FileServiceImpl implements FileService {
 
         if (permissionForUser == null) {
             perm.setFileDTO(fileDTO);
-            fileDTO.getPermissionDTOs().add(perm);
+            fileDTO.getPermissions().add(perm);
             saveFile(fileDTO);
         } else {
             fileTransformer.copyPermissionDTOToEntity(perm, permissionForUser, savedFile);

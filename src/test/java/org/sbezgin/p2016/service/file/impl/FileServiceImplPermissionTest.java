@@ -428,7 +428,7 @@ public class FileServiceImplPermissionTest {
     private void testUpdatePermission() {
         List<AbstractFileDTO> files = fileService.getFilesByName("/ROOT", "Test File");
         AbstractFileDTO fileDTO = files.get(0);
-        PermissionDTO permissionDTO = fileDTO.getPermissionDTOs().get(0);
+        PermissionDTO permissionDTO = fileDTO.getPermissions().get(0);
         permissionDTO.setWrite(true);
         permissionDTO.setDelete(false);
 
@@ -438,7 +438,7 @@ public class FileServiceImplPermissionTest {
 
         files = fileService.getFilesByName("/ROOT", "Test File");
         fileDTO = files.get(0);
-        permissionDTO = fileDTO.getPermissionDTOs().get(0);
+        permissionDTO = fileDTO.getPermissions().get(0);
         assertTrue(permissionDTO.getRead());
         assertTrue(permissionDTO.getWrite());
         assertFalse(permissionDTO.getDelete());
@@ -469,12 +469,12 @@ public class FileServiceImplPermissionTest {
         TextFileDTO textFileDTO = (TextFileDTO) children.get(0);
 
         //-------------------------------------
-        List<PermissionDTO> permissionDTOs = firstFolder.getPermissionDTOs();
+        List<PermissionDTO> permissionDTOs = firstFolder.getPermissions();
         assertEquals(1, permissionDTOs.size());
         assertEquals(permissionDTO, permissionDTOs.get(0));
 
 
-        permissionDTOs = secondFolder.getPermissionDTOs();
+        permissionDTOs = secondFolder.getPermissions();
         assertEquals(1, permissionDTOs.size());
         PermissionDTO savedPerm = permissionDTOs.get(0);
         assertTrue(savedPerm.getRead());
@@ -482,7 +482,7 @@ public class FileServiceImplPermissionTest {
         assertNull(savedPerm.getDelete());
         assertEquals(user2ID, savedPerm.getUserID());
 
-        permissionDTOs = textFileDTO.getPermissionDTOs();
+        permissionDTOs = textFileDTO.getPermissions();
         assertEquals(1, permissionDTOs.size());
         savedPerm = permissionDTOs.get(0);
         assertTrue(savedPerm.getRead());
@@ -545,7 +545,7 @@ public class FileServiceImplPermissionTest {
         AbstractFileDTO fileDTO = fileService.getFileByID(file.getId());
 
         assertNotNull(fileDTO);
-        List<PermissionDTO> permissionDTOs = fileDTO.getPermissionDTOs();
+        List<PermissionDTO> permissionDTOs = fileDTO.getPermissions();
         assertEquals(1, permissionDTOs.size());
 
         PermissionDTO savedPermissionDTO = permissionDTOs.get(0);

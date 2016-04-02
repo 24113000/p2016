@@ -3,10 +3,11 @@ package org.sbezgin.p2016.rest.response.impl;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.fasterxml.jackson.databind.module.SimpleSerializers;
 import org.sbezgin.p2016.common.P2016Exception;
-import org.sbezgin.p2016.db.dto.file.AbstractFileDTO;
 import org.sbezgin.p2016.rest.response.ResponseBuilder;
-import org.sbezgin.p2016.rest.response.ResultContainer;
+
+import java.util.List;
 
 public class FileResponseBuilderImpl implements ResponseBuilder {
 
@@ -32,9 +33,9 @@ public class FileResponseBuilderImpl implements ResponseBuilder {
     @Override
     public Object buildResponse() {
         ObjectMapper mapper = new ObjectMapper();
-        SimpleModule mod = new SimpleModule();
-        mod.addSerializer(new FileSerializer(AbstractFileDTO.class, userID));
-        mapper.registerModule(mod);
+        SimpleModule module = new SimpleModule();
+        module.addSerializer(List.class, new PermissionSerializer(userID));
+        mapper.registerModule(module);
         try {
             return mapper.writeValueAsString(resultContainer);
         } catch (JsonProcessingException e) {

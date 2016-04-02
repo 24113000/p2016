@@ -1,0 +1,54 @@
+package org.sbezgin.p2016.rest.response.impl;
+
+import org.junit.Test;
+import org.sbezgin.p2016.db.dto.PermissionDTO;
+import org.sbezgin.p2016.db.dto.file.AbstractFileDTO;
+import org.sbezgin.p2016.db.dto.file.FolderDTO;
+import org.sbezgin.p2016.rest.response.ResponseBuilder;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.List;
+
+public class FileResponseBuilderImplTest  {
+
+    private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy/MM/dd");
+
+    @Test
+    public void testConvertFileToJSON() throws ParseException {
+
+        long fileID = 2L;
+
+        AbstractFileDTO fileDTO = createTestObject(fileID);
+
+        ResponseBuilder responseBuilder = new FileResponseBuilderImpl(1L);
+        String resp = (String) responseBuilder.setStatus(ResponseBuilder.SUCCESS)
+                .setDataObject(fileDTO)
+                .buildResponse();
+        System.out.println(resp);
+    }
+
+    private AbstractFileDTO createTestObject(long fileID) throws ParseException {
+        AbstractFileDTO fileDTO = new FolderDTO();
+        fileDTO.setId(fileID);
+        fileDTO.setName("TestName");
+        fileDTO.setParentId(1L);
+        fileDTO.setIdPath("/1");
+        fileDTO.setPath("/ROOT");
+        fileDTO.setCreateDate(simpleDateFormat.parse("2016/03/01"));
+        fileDTO.setUpdateDate(simpleDateFormat.parse("2016/02/02"));
+
+        List<PermissionDTO> perms = new ArrayList<>();
+        PermissionDTO permissionDTO = new PermissionDTO();
+        permissionDTO.setId(99L);
+        permissionDTO.setUserID(1L);
+        permissionDTO.setFileDTO(fileDTO);
+        permissionDTO.setRead(true);
+        permissionDTO.setDelete(true);
+        perms.add(permissionDTO);
+
+        fileDTO.setPermissions(perms);
+        return fileDTO;
+    }
+}

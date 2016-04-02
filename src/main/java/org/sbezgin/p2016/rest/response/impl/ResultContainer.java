@@ -1,4 +1,4 @@
-package org.sbezgin.p2016.rest.response;
+package org.sbezgin.p2016.rest.response.impl;
 
 public class ResultContainer {
 

@@ -11,6 +11,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.junit.Assert.assertEquals;
+
 public class FileResponseBuilderImplTest  {
 
     private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy/MM/dd");
@@ -26,7 +28,11 @@ public class FileResponseBuilderImplTest  {
         String resp = (String) responseBuilder.setStatus(ResponseBuilder.SUCCESS)
                 .setDataObject(fileDTO)
                 .buildResponse();
-        System.out.println(resp);
+
+        assertEquals(
+                "{\"status\":\"success\",\"data\":{\"id\":2,\"name\":\"TestName\",\"path\":\"/ROOT\",\"idPath\":\"/1\",\"parentId\":1,\"createDate\":1456783200000,\"updateDate\":1454364000000,\"permissions\":{\"read\":true,\"write\":false,\"delete\":true}}}",
+                resp
+        );
     }
 
     private AbstractFileDTO createTestObject(long fileID) throws ParseException {

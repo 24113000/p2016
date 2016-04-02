@@ -19,16 +19,13 @@ public class PermissionSerializer extends JsonSerializer<List> {
 
     @Override
     public void serialize(List values, JsonGenerator gen, SerializerProvider serializers) throws IOException, JsonProcessingException {
-        if (CollectionUtils.isNotEmpty(values)
-                && values.get(0).getClass().equals(PermissionDTO.class)) {
+        if (CollectionUtils.isNotEmpty(values)) {
             PermissionDTO permission = getPermission(values, userID);
             gen.writeStartObject();
             gen.writeBooleanField("read", permission.getRead() == null ? false : permission.getRead());
             gen.writeBooleanField("write", permission.getWrite() == null? false : permission.getWrite());
             gen.writeBooleanField("delete", permission.getDelete() == null? false : permission.getDelete());
             gen.writeEndObject();
-        } else {
-            serializers.defaultSerializeValue(values, gen);
         }
     }
 

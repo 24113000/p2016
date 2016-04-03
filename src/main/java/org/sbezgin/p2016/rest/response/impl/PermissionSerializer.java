@@ -10,7 +10,7 @@ import org.sbezgin.p2016.db.dto.PermissionDTO;
 import java.io.IOException;
 import java.util.List;
 
-public class PermissionSerializer extends JsonSerializer<List> {
+public class PermissionSerializer extends JsonSerializer {
     private Long userID;
 
     public PermissionSerializer(Long userID) {
@@ -18,22 +18,22 @@ public class PermissionSerializer extends JsonSerializer<List> {
     }
 
     @Override
-    public void serialize(List values, JsonGenerator gen, SerializerProvider serializers) throws IOException, JsonProcessingException {
-        if (CollectionUtils.isNotEmpty(values)) {
-            PermissionDTO permission = getPermission(values, userID);
+    public void serialize(Object values, JsonGenerator gen, SerializerProvider serializers) throws IOException, JsonProcessingException {
+        List<PermissionDTO> permissionDTOs = (List<PermissionDTO>) values;
+        if (CollectionUtils.isNotEmpty(permissionDTOs)) {
+            PermissionDTO permission = getPermission(permissionDTOs, userID);
             gen.writeStartObject();
             gen.writeBooleanField("read", permission.getRead() == null ? false : permission.getRead());
-            gen.writeBooleanField("write", permission.getWrite() == null? false : permission.getWrite());
-            gen.writeBooleanField("delete", permission.getDelete() == null? false : permission.getDelete());
+            gen.writeBooleanField("write", permission.getWrite() == null ? false : permission.getWrite());
+            gen.writeBooleanField("delete", permission.getDelete() == null ? false : permission.getDelete());
             gen.writeEndObject();
         }
     }
 
-    private PermissionDTO getPermission(List permissionDTOs, Long userID) {
-        for (Object permissionDTO : permissionDTOs) {
-            PermissionDTO perm = (PermissionDTO) permissionDTO;
-            if (perm.getUserID().equals(userID)) {
-                return perm;
+    private PermissionDTO getPermission(List<PermissionDTO> permissionDTOs, Long userID) {
+        for (PermissionDTO permissionDTO : permissionDTOs) {
+            if (permissionDTO.getUserID().equals(userID)) {
+                return permissionDTO;
             }
         }
         return null;

@@ -9,11 +9,12 @@ import org.sbezgin.p2016.rest.response.ResponseBuilder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
-public class FileResponseBuilderImplTest  {
+public class FileResponseBuilderImplTest {
 
     private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy/MM/dd");
 
@@ -30,10 +31,29 @@ public class FileResponseBuilderImplTest  {
                 .buildResponse();
 
         assertEquals(
-                "{\"status\":\"success\",\"data\":{\"id\":2,\"name\":\"TestName\",\"path\":\"/ROOT\",\"idPath\":\"/1\",\"parentId\":1,\"createDate\":1456783200000,\"updateDate\":1454364000000,\"permissions\":{\"read\":true,\"write\":false,\"delete\":true}}}",
+                "{\"status\":\"success\",\"data\":{\"id\":2,\"name\":\"TestName\",\"path\":\"/ROOT\",\"idPath\":\"/1\",\"parentId\":1,\"createDate\":1456783200000,\"updateDate\":1454364000000,\"permissions\":{\"read\":true,\"write\":false,\"delete\":true},\"isFolder\":true}}",
                 resp
         );
     }
+
+    @Test
+    public void testConvertFilesToJSON() throws ParseException {
+        long fileID = 2L;
+
+        List<AbstractFileDTO> files = Arrays.asList(createTestObject(fileID), createTestObject(fileID + 1));
+
+        ResponseBuilder responseBuilder = new FileResponseBuilderImpl(1L);
+        String resp = (String) responseBuilder.setStatus(ResponseBuilder.SUCCESS)
+                .setDataObject(files)
+                .buildResponse();
+
+        assertEquals(
+                "{\"status\":\"success\",\"data\":[{\"id\":2,\"name\":\"TestName\",\"path\":\"/ROOT\",\"idPath\":\"/1\",\"parentId\":1,\"createDate\":1456783200000,\"updateDate\":1454364000000,\"permissions\":{\"read\":true,\"write\":false,\"delete\":true},\"isFolder\":true},{\"id\":3,\"name\":\"TestName\",\"path\":\"/ROOT\",\"idPath\":\"/1\",\"parentId\":1,\"createDate\":1456783200000,\"updateDate\":1454364000000,\"permissions\":{\"read\":true,\"write\":false,\"delete\":true},\"isFolder\":true}]}",
+                resp
+        );
+
+    }
+
 
     private AbstractFileDTO createTestObject(long fileID) throws ParseException {
         AbstractFileDTO fileDTO = new FolderDTO();

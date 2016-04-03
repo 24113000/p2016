@@ -1,5 +1,6 @@
 package org.sbezgin.p2016.db.dto.file;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.sbezgin.p2016.db.dto.PermissionDTO;
 
 import java.util.ArrayList;
@@ -79,6 +80,11 @@ public abstract class AbstractFileDTO {
 
     public void setUpdateDate(Date updateDate) {
         this.updateDate = updateDate;
+    }
+
+    @JsonProperty(value = "isFolder")
+    public boolean isFolder() {
+        return this.getClass().equals(FolderDTO.class);
     }
 
     @Override

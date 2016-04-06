@@ -21,18 +21,21 @@ public class PermissionSerializer extends JsonSerializer {
     public void serialize(Object values, JsonGenerator gen, SerializerProvider serializers) throws IOException, JsonProcessingException {
         List<PermissionDTO> permissionDTOs = (List<PermissionDTO>) values;
         if (CollectionUtils.isNotEmpty(permissionDTOs)) {
-            PermissionDTO permission = getPermission(permissionDTOs, userID);
             gen.writeStartObject();
-            gen.writeBooleanField("read", permission.getRead() == null ? false : permission.getRead());
-            gen.writeBooleanField("write", permission.getWrite() == null ? false : permission.getWrite());
-            gen.writeBooleanField("delete", permission.getDelete() == null ? false : permission.getDelete());
+            PermissionDTO permission = getPermission(permissionDTOs, userID);
+            if (permission != null) {
+                gen.writeBooleanField("read", permission.getRead() == null ? false : permission.getRead());
+                gen.writeBooleanField("write", permission.getWrite() == null ? false : permission.getWrite());
+                gen.writeBooleanField("delete", permission.getDelete() == null ? false : permission.getDelete());
+            }
             gen.writeEndObject();
         }
     }
 
     private PermissionDTO getPermission(List<PermissionDTO> permissionDTOs, Long userID) {
         for (PermissionDTO permissionDTO : permissionDTOs) {
-            if (permissionDTO.getUserID().equals(userID)) {
+            Long permUserID = permissionDTO.getUserID();
+            if (permUserID != null && permUserID.equals(userID)) {
                 return permissionDTO;
             }
         }

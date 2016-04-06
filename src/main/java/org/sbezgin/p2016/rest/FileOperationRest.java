@@ -109,4 +109,12 @@ public class FileOperationRest {
     public Response setPermission(long fileID, String userID, boolean read, boolean write, boolean del) {
         return Response.ok().build();
     }
+
+    public FileService getFileService() {
+        return fileService;
+    }
+
+    public void setFileService(FileService fileService) {
+        this.fileService = fileService;
+    }
 }

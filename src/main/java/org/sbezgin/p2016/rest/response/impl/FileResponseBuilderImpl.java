@@ -29,9 +29,6 @@ public class FileResponseBuilderImpl implements ResponseBuilder {
     @Override
     public Object buildResponse() {
         ObjectMapper mapper = new ObjectMapper();
-        /*SimpleModule module = new SimpleModule();
-        module.addSerializer(List.class, new PermissionSerializer(userID));
-        mapper.registerModule(module);*/
         mapper.setSerializerFactory(new PermissionSerializerFactory(userID));
         try {
             return mapper.writeValueAsString(resultContainer);

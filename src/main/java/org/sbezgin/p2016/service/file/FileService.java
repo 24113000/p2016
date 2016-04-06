@@ -44,4 +44,6 @@ public interface FileService {
     PermissionDTO getUserFilePermission(AbstractFileDTO fileDTO, Long userID);
 
     PermissionDTO getCurrentUserFilePermission(AbstractFileDTO fileDTO);
+
+    void saveTextFileContent(long fileID, String fileContent);
 }

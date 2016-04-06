@@ -6,6 +6,7 @@ import org.sbezgin.p2016.db.dto.PermissionDTO;
 import org.sbezgin.p2016.db.dto.UserDTO;
 import org.sbezgin.p2016.db.dto.file.AbstractFileDTO;
 import org.sbezgin.p2016.db.dto.file.FolderDTO;
+import org.sbezgin.p2016.db.dto.file.TextFileContentDTO;
 import org.sbezgin.p2016.db.dto.file.TextFileDTO;
 import org.sbezgin.p2016.db.entity.Permission;
 import org.sbezgin.p2016.db.entity.file.AbstractFile;
@@ -423,6 +424,7 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
+    @Transactional(propagation = Propagation.REQUIRED)
     public PermissionDTO getUserFilePermission(AbstractFileDTO fileDTO, Long userID) {
         Permission permission = fileDAO.getUserFilePermission(fileDTO.getId(), userID);
         if (permission != null) {
@@ -433,9 +435,22 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
+    @Transactional(propagation = Propagation.REQUIRED)
     public PermissionDTO getCurrentUserFilePermission(AbstractFileDTO fileDTO) {
         UserDTO currentUser = userService.getCurrentUser();
         return getUserFilePermission(fileDTO, currentUser.getId());
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED)
+    public void saveTextFileContent(long fileID, String fileContent) {
+        TextFileDTO fullTextFile = getFullTextFile(fileID);
+        TextFileContentDTO content = fullTextFile.getFileContent();
+        if (content == null) {
+            content = new TextFileContentDTO();
+        }
+        content.setData(fileContent);
+        saveFile(fullTextFile);
     }
 
     public FileDAO getFileDAO() {

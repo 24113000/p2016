@@ -29,6 +29,8 @@ public class PermissionSerializer extends JsonSerializer {
                 gen.writeBooleanField("delete", permission.getDelete() == null ? false : permission.getDelete());
             }
             gen.writeEndObject();
+        } else {
+            gen.writeNull();
         }
     }
 

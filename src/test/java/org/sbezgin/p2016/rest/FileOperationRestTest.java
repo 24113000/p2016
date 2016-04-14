@@ -2,17 +2,22 @@ package org.sbezgin.p2016.rest;
 
 import org.junit.Test;
 import org.sbezgin.p2016.db.dto.PermissionDTO;
+import org.sbezgin.p2016.db.dto.file.AbstractFileDTO;
 import org.sbezgin.p2016.db.dto.file.FolderDTO;
+import org.sbezgin.p2016.db.dto.file.TextFileContentDTO;
+import org.sbezgin.p2016.db.dto.file.TextFileDTO;
+import org.sbezgin.p2016.db.entity.file.AbstractFile;
 import org.sbezgin.p2016.service.file.FileService;
 
 import javax.ws.rs.core.Response;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 public class FileOperationRestTest {
 
@@ -70,25 +75,67 @@ public class FileOperationRestTest {
         assertEquals(expResult, entity);
     }
 
+    @Test
+    public void testGetFolderChildren() {
+        long folderID = 2L;
 
-    public void testGetFolderChildren(){
+        FileService fileService = rest.getFileService();
+        List<AbstractFileDTO> fileList = Arrays.asList(new FolderDTO(), new TextFileDTO());
+        when(fileService.getChildren(folderID, 0, 50)).then(invocationOnMock -> fileList);
 
+        Response resp = rest.getFolderChildren(folderID, 0, 50);
+        Object entity = resp.getEntity();
+
+        String expResult = "{\"status\":\"success\",\"data\":[{\"id\":null,\"name\":null,\"path\":null,\"idPath\":null,\"parentId\":null,\"createDate\":null,\"updateDate\":null,\"permissions\":null,\"isFolder\":true},{\"id\":null,\"name\":null,\"path\":null,\"idPath\":null,\"parentId\":null,\"createDate\":null,\"updateDate\":null,\"permissions\":null,\"type\":null,\"fileContent\":null,\"isFolder\":false}]}";
+        assertEquals(expResult, entity);
     }
 
-
+    @Test
     public void testGetFileContent() {
+        long fileID = 2L;
 
+        FileService fileService = rest.getFileService();
+
+        TextFileDTO textFileDTO = new TextFileDTO();
+        TextFileContentDTO contentDTO = new TextFileContentDTO();
+        contentDTO.setData("111 222");
+        textFileDTO.setFileContent(contentDTO);
+
+        when(fileService.getFullTextFile(fileID)).then(invocationOnMock -> textFileDTO);
+
+        Response resp = rest.getFileContent(fileID);
+        Object entity = resp.getEntity();
+
+        String expResult = "{\"status\":\"success\",\"data\":{\"id\":null,\"name\":null,\"path\":null,\"idPath\":null,\"parentId\":null,\"createDate\":null,\"updateDate\":null,\"permissions\":null,\"type\":null,\"fileContent\":{\"id\":null,\"data\":\"111 222\"},\"isFolder\":false}}";
+        assertEquals(expResult, entity);
     }
 
-
+    @Test
     public void testSaveFileContent() {
+        long fileID = 2L;
+        String fileContent = "111 222";
 
+        FileService fileService = rest.getFileService();
+
+        TextFileDTO textFileDTO = new TextFileDTO();
+
+        when(fileService.getFullTextFile(fileID)).then(invocationOnMock -> textFileDTO);
+
+        rest.saveFileContent(fileID, fileContent);
+
+        verify(fileService, times(1)).saveTextFileContent(fileID, fileContent);
     }
 
-
+    @Test
     public void testCreateFolder() {
+        FileService fileService = rest.getFileService();
 
+        rest.createFolder("test", 11L);
 
+        FolderDTO newFolder = new FolderDTO();
+        newFolder.setName("test");
+        newFolder.setParentId(11L);
+        verify(fileService, times(1)).saveFile(newFolder);
     }
 
 

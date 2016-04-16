@@ -98,9 +98,7 @@ public class FileOperationRest {
     @POST
     @Path("/renameFile")
     public Response renameFile(long fileID, String newName) {
-        AbstractFileDTO fileByID = fileService.getFileByID(fileID);
-        fileByID.setName(newName);
-        fileService.saveFile(fileByID);
+        fileService.renameFile(fileID, newName);
         return Response.ok().build();
     }
 

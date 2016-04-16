@@ -1,18 +1,17 @@
 package org.sbezgin.p2016.rest;
 
 import org.junit.Test;
+import org.sbezgin.p2016.common.FileType;
 import org.sbezgin.p2016.db.dto.PermissionDTO;
 import org.sbezgin.p2016.db.dto.file.AbstractFileDTO;
 import org.sbezgin.p2016.db.dto.file.FolderDTO;
 import org.sbezgin.p2016.db.dto.file.TextFileContentDTO;
 import org.sbezgin.p2016.db.dto.file.TextFileDTO;
-import org.sbezgin.p2016.db.entity.file.AbstractFile;
 import org.sbezgin.p2016.service.file.FileService;
 
 import javax.ws.rs.core.Response;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -138,19 +137,35 @@ public class FileOperationRestTest {
         verify(fileService, times(1)).saveFile(newFolder);
     }
 
-
+    @Test
     public void testCreateFile() {
+        FileService fileService = rest.getFileService();
 
+        rest.createFile("testName", FileType.JSON.toString(), 11L);
+
+        TextFileDTO newFile = new TextFileDTO();
+        newFile.setType(FileType.JSON);
+        newFile.setName("testName");
+        newFile.setParentId(11L);
+        verify(fileService, times(1)).saveFile(newFile);
     }
 
-
+    @Test
     public void testDeleteFile() {
+        FileService fileService = rest.getFileService();
 
+        rest.deleteFile(11L);
+
+        verify(fileService, times(1)).deleteFile(11L, false);
     }
 
-
+    @Test
     public void testRenameFile() {
+        FileService fileService = rest.getFileService();
 
+        rest.renameFile(11L, "new_name");
+
+        verify(fileService, times(1)).renameFile(11L, "new_name");
     }
 
 

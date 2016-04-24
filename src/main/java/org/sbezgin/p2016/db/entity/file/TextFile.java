@@ -2,10 +2,7 @@ package org.sbezgin.p2016.db.entity.file;
 
 import org.sbezgin.p2016.common.FileType;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.PrimaryKeyJoinColumn;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Entity
 @Table(name = "text_file")
@@ -14,6 +11,7 @@ public class TextFile extends AbstractFile {
     private FileType type;
 
     @Column(name = "type", nullable = false)
+    @Enumerated(EnumType.STRING)
     public FileType getType() {
         return type;
     }

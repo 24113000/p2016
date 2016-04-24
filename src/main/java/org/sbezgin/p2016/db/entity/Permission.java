@@ -72,6 +72,7 @@ public class Permission {
     }
 
     @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "file_id")
     public AbstractFile getAbstractFile() {
         return abstractFile;
     }

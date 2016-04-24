@@ -28,7 +28,6 @@
         <property name="dozerBeanMapper" ref="dozer"/>
         <property name="beanMap">
             <map>
-                <entry key=""    value=""/>
                 <entry key="org.sbezgin.p2016.db.dto.UserDTO"           value="org.sbezgin.p2016.db.entity.User"/>
                 <entry key="org.sbezgin.p2016.db.dto.PermissionDTO"     value="org.sbezgin.p2016.db.entity.Permission"/>
             </map>

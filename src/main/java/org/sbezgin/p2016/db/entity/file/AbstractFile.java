@@ -105,8 +105,7 @@ public abstract class AbstractFile {
         this.fileContent = fileContent;
     }
 
-    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "file_id")
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "abstractFile", cascade = CascadeType.ALL, orphanRemoval = true)
     public List<Permission> getPermissions() {
         return permissions;
     }

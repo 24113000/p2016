@@ -10,10 +10,10 @@
         <param-value>WEB-INF/spring/applicationContext*.xml</param-value>
     </context-param>
 
-    <listener >
+    <listener>
         <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
     </listener>
-
+    <!-- ############# SERVLETS ################################### -->
     <servlet>
         <servlet-name>dispatcher</servlet-name>
         <servlet-class>
@@ -21,6 +21,25 @@
         </servlet-class>
         <load-on-startup>1</load-on-startup>
     </servlet>
+    <servlet>
+        <servlet-name>jersey-servlet</servlet-name>
+        <servlet-class>
+            com.sun.jersey.spi.spring.container.servlet.SpringServlet
+        </servlet-class>
+        <init-param>
+            <param-name>
+                com.sun.jersey.config.property.packages
+            </param-name>
+            <param-value>org.sbezgin.p2016.rest</param-value>
+        </init-param>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+
+    <!-- ############# SERVLETS MAPPING ########################### -->
+    <servlet-mapping>
+        <servlet-name>jersey-servlet</servlet-name>
+        <url-pattern>/rest/*</url-pattern>
+    </servlet-mapping>
 
     <servlet-mapping>
         <servlet-name>dispatcher</servlet-name>

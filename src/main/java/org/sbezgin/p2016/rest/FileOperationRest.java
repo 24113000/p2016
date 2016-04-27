@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
 import java.util.List;
 
@@ -24,8 +25,8 @@ public class FileOperationRest {
     private FileService fileService;
 
     @GET
-    @Path("/getFile")
-    public Response getFile(long fileID) {
+    @Path("/getFile/{fileID}")
+    public Response getFile(@PathParam("fileID") long fileID) {
         AbstractFileDTO file = fileService.getFileByID(fileID);
         Object respObj = new FileResponseBuilderImpl(1L)
                 .setStatus(ResponseBuilder.SUCCESS)

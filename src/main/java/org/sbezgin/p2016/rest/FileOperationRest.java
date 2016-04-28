@@ -10,10 +10,7 @@ import org.sbezgin.p2016.service.file.FileService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
+import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 import java.util.List;
 
@@ -33,12 +30,15 @@ public class FileOperationRest {
                 .setDataObject(file)
                 .buildResponse();
         return Response.ok(respObj).build();
-
     }
 
     @GET
-    @Path("/getFolderChildren")
-    public Response getFolderChildren(long folderID, int start, int end){
+    @Path("/getFolderChildren/{folderID}/{start}/{end}")
+    public Response getFolderChildren(
+            @PathParam("folderID") long folderID,
+            @PathParam("start") int start,
+            @PathParam("end") int end
+    ){
         List<AbstractFileDTO> children = fileService.getChildren(folderID, start, end);
         Object respObj = new FileResponseBuilderImpl(1L)
                 .setStatus(ResponseBuilder.SUCCESS)
@@ -48,8 +48,8 @@ public class FileOperationRest {
     }
 
     @GET
-    @Path("/getFileContent")
-    public Response getFileContent(long textFileID) {
+    @Path("/getFileContent/{fileID}")
+    public Response getFileContent(@PathParam("fileID") long textFileID) {
         TextFileDTO textFile = fileService.getFullTextFile(textFileID);
         Object respObj = new FileResponseBuilderImpl(1L)
                 .setStatus(ResponseBuilder.SUCCESS)
@@ -60,15 +60,20 @@ public class FileOperationRest {
 
     @POST
     @Path("/saveFileContent")
-    public Response saveFileContent(long fileID, String fileContent) {
+    public Response saveFileContent(
+            @FormParam("fileID") long fileID,
+            @FormParam("fileContent") String fileContent
+    ) {
         fileService.saveTextFileContent(fileID, fileContent);
         return Response.ok().build();
     }
 
     @POST
     @Path("/createFolder")
-    public Response createFolder(String name, long parentID) {
-
+    public Response createFolder(
+            @FormParam("name") String name,
+            @FormParam("parentID") long parentID
+    ) {
         FolderDTO newFolder = new FolderDTO();
         newFolder.setName(name);
         newFolder.setParentId(parentID);
@@ -79,7 +84,11 @@ public class FileOperationRest {
 
     @POST
     @Path("/createFile")
-    public Response createFile(String fileName, String type, long parentID) {
+    public Response createFile(
+            @FormParam("fileName") String fileName,
+            @FormParam("type") String type,
+            @FormParam("parentID") long parentID
+    ) {
         TextFileDTO newFile = new TextFileDTO();
         newFile.setType(FileType.valueOf(type));
         newFile.setName(fileName);
@@ -90,22 +99,31 @@ public class FileOperationRest {
     }
 
     @GET
-    @Path("/deleteFile")
-    public Response deleteFile(long fileID) {
+    @Path("/deleteFile/{fileID}")
+    public Response deleteFile(@PathParam("fileID") long fileID) {
         fileService.deleteFile(fileID, false);
         return Response.ok().build();
     }
 
     @POST
     @Path("/renameFile")
-    public Response renameFile(long fileID, String newName) {
+    public Response renameFile(
+            @FormParam("fileID") long fileID,
+            @FormParam("newName") String newName
+    ) {
         fileService.renameFile(fileID, newName);
         return Response.ok().build();
     }
 
     @POST
     @Path("/setPermission")
-    public Response setPermission(long fileID, String userID, boolean read, boolean write, boolean del) {
+    public Response setPermission(
+            @FormParam("fileID") long fileID,
+            @FormParam("userID") String userID,
+            @FormParam("read") boolean read,
+            @FormParam("write") boolean write,
+            @FormParam("del") boolean del
+    ) {
         return Response.ok().build();
     }
 

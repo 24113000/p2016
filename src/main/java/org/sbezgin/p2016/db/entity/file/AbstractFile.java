@@ -12,7 +12,8 @@ import java.util.List;
         pkColumnName = "key_gen",
         valueColumnName = "hi",
         pkColumnValue="FILE_GEN",
-        allocationSize=20
+        allocationSize=20,
+        initialValue = 10
 )
 
 @Entity

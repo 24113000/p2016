@@ -6,7 +6,7 @@ CREATE TABLE `File` (
 	`parent_id` BIGINT,
 	`class` varchar(250) NOT NULL,
 	`owner_id` BIGINT NOT NULL,
-	`content_id` BIGINT NOT NULL,
+	`content_id` BIGINT,
 	`create_date` DATE NOT NULL,
 	`update_date` DATE NOT NULL,
 	PRIMARY KEY (`id`)

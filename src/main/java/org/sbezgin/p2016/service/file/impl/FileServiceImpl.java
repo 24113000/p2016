@@ -106,11 +106,10 @@ public class FileServiceImpl implements FileService {
                 fileEntity.setPath("/");
                 fileEntity.setIdPath("/");
             } else {
-                AbstractFile parent = fileDAO.getFileByID(userID, parentId);
+                AbstractFile parent = getFile(parentId, userID);
                 if (parent == null) {
                     throw new P2016Exception("Cannot get parent folder by ID " + parentId + " and user ID " + userID);
                 }
-
                 String newPathId;
                 String newPath;
                 if (parent.getParentId() == null) {
@@ -378,7 +377,7 @@ public class FileServiceImpl implements FileService {
     public List<AbstractFileDTO> getChildren(long folderID, int start, int end) {
         UserDTO currentUser = userService.getCurrentUser();
 
-        AbstractFile fileByID = fileDAO.getFileByID(currentUser.getId(), folderID);
+        AbstractFile fileByID = getFile(folderID, currentUser.getId());
 
         if (fileByID != null) {
             List<AbstractFile> children = fileDAO.getChildren(currentUser.getId(), folderID, start, end);
@@ -452,6 +451,14 @@ public class FileServiceImpl implements FileService {
         }
         content.setData(fileContent);
         saveFile(fullTextFile);
+    }
+
+    private AbstractFile getFile(Long fileID, Long userID) {
+        if (fileID == CommonConstants.ROOT_FOLDER_ID) {
+            return fileDAO.getRootFolder();
+        } else {
+            return fileDAO.getFileByID(userID, fileID);
+        }
     }
 
     public FileDAO getFileDAO() {

@@ -1,5 +1,6 @@
 package org.sbezgin.p2016.mvc;
 
+import org.sbezgin.p2016.common.CommonConstants;
 import org.sbezgin.p2016.db.dto.file.FolderDTO;
 import org.sbezgin.p2016.service.file.FileService;
 import org.springframework.web.servlet.ModelAndView;
@@ -16,7 +17,7 @@ public class P2016MainController extends AbstractController {
     protected ModelAndView handleRequestInternal(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws Exception {
         ModelAndView mv = new ModelAndView();
         FolderDTO simpleFolder = new FolderDTO();
-        simpleFolder.setName("ROOT");
+        simpleFolder.setName(CommonConstants.ROOT_FOLDER_NAME);
         simpleFolder.setParentId(null);
         simpleFolder.setIdPath("/");
         simpleFolder.setPath("/");

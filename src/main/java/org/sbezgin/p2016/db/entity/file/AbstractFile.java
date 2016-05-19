@@ -13,7 +13,7 @@ import java.util.List;
         valueColumnName = "hi",
         pkColumnValue="FILE_GEN",
         allocationSize=20,
-        initialValue = 10
+        initialValue = 100
 )
 
 @Entity

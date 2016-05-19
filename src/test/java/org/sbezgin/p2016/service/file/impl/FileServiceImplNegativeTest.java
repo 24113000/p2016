@@ -1,6 +1,5 @@
 package org.sbezgin.p2016.service.file.impl;
 
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.sbezgin.p2016.db.dto.UserDTO;
@@ -14,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.ContextHierarchy;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,6 +36,7 @@ public class FileServiceImplNegativeTest {
     private FileService fileService;
 
     @Test
+    @Sql({"/add_root_directory.sql"})
     @Transactional
     public void testNegativeFileOperation() {
 
@@ -48,7 +49,6 @@ public class FileServiceImplNegativeTest {
         });
         service.setUserService(userService);
 
-        testGettingRootFolderIfDoesntExist();
         testFolderByIncorrectID();
         testGetChildrenFolderByIncorrectID();
         testDeleteFileByIncorrectID();
@@ -62,17 +62,8 @@ public class FileServiceImplNegativeTest {
 
     private void testDeletingNotEmptyFolder() {
         //creating folders
-        FolderDTO rootFolder = new FolderDTO();
-        rootFolder.setName("ROOT");
-        rootFolder.setParentId(null);
-        rootFolder.setIdPath("/");
-        rootFolder.setPath("/");
 
-        fileService.saveFile(rootFolder);
-
-        commitAndStartTransaction();
-
-        rootFolder = fileService.getRootFolder();
+        FolderDTO rootFolder = fileService.getRootFolder();
 
         FolderDTO someFolder = new FolderDTO();
         someFolder.setName("Test Folder");

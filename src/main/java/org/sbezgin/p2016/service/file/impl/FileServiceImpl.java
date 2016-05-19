@@ -1,5 +1,6 @@
 package org.sbezgin.p2016.service.file.impl;
 
+import org.sbezgin.p2016.common.CommonConstants;
 import org.sbezgin.p2016.common.P2016Exception;
 import org.sbezgin.p2016.db.dao.FileDAO;
 import org.sbezgin.p2016.db.dto.PermissionDTO;
@@ -113,8 +114,8 @@ public class FileServiceImpl implements FileService {
                 String newPathId;
                 String newPath;
                 if (parent.getParentId() == null) {
-                    newPathId = parent.getIdPath() + parentId;
-                    newPath = parent.getPath() + parent.getName();
+                    newPathId = "/"  + CommonConstants.ROOT_FOLDER_ID;
+                    newPath =  "/"  + CommonConstants.ROOT_FOLDER_NAME;
                 } else {
                     newPathId = parent.getIdPath() + "/" + parentId;
                     newPath = parent.getPath() + "/" + parent.getName();

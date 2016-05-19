@@ -3,6 +3,7 @@ package org.sbezgin.p2016.db.dao.impl;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.sbezgin.p2016.common.CommonConstants;
 import org.sbezgin.p2016.db.dao.FileDAO;
 import org.sbezgin.p2016.db.entity.Permission;
 import org.sbezgin.p2016.db.entity.file.AbstractFile;
@@ -144,7 +145,7 @@ public class FileDAOImpl implements FileDAO {
         Session session = getSession();
         Query query = session.createQuery(
                 " from AbstractFile as file " +
-                        " where file.parentId is NULL AND file.name = 'ROOT' ");
+                        " where file.parentId is NULL AND file.name = '" + CommonConstants.ROOT_FOLDER_NAME + "' ");
         return (AbstractFile) query.uniqueResult();
     }
 

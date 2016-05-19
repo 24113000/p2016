@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.List;
 
@@ -60,6 +61,7 @@ public class FileOperationRest {
 
     @POST
     @Path("/saveFileContent")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response saveFileContent(
             @FormParam("fileID") long fileID,
             @FormParam("fileContent") String fileContent
@@ -70,6 +72,7 @@ public class FileOperationRest {
 
     @POST
     @Path("/createFolder")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response createFolder(
             @FormParam("name") String name,
             @FormParam("parentID") long parentID
@@ -84,6 +87,7 @@ public class FileOperationRest {
 
     @POST
     @Path("/createFile")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response createFile(
             @FormParam("fileName") String fileName,
             @FormParam("type") String type,
@@ -107,6 +111,7 @@ public class FileOperationRest {
 
     @POST
     @Path("/renameFile")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response renameFile(
             @FormParam("fileID") long fileID,
             @FormParam("newName") String newName
@@ -117,6 +122,7 @@ public class FileOperationRest {
 
     @POST
     @Path("/setPermission")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Response setPermission(
             @FormParam("fileID") long fileID,
             @FormParam("userID") String userID,

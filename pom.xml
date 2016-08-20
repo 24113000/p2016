@@ -15,6 +15,7 @@
             <version>5.0.7.Final</version>
         </dependency>
 
+        <!-- Spring -->
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
@@ -40,7 +41,25 @@
             <artifactId>spring-web</artifactId>
             <version>4.2.4.RELEASE</version>
         </dependency>
-        <!-- Jersey + Spring -->
+
+        <!-- Spring Security -->
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-web</artifactId>
+            <version>4.0.4.RELEASE</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-config</artifactId>
+            <version>4.0.4.RELEASE</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-taglibs</artifactId>
+            <version>4.0.4.RELEASE</version>
+        </dependency>
+
+        <!-- Jersey -->
         <dependency>
             <groupId>com.sun.jersey.contribs</groupId>
             <artifactId>jersey-spring</artifactId>

@@ -1,0 +1,52 @@
+<beans:beans xmlns="http://www.springframework.org/schema/security"
+             xmlns:beans="http://www.springframework.org/schema/beans"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+		http://www.springframework.org/schema/security
+		http://www.springframework.org/schema/security/spring-security.xsd">
+
+    <http entry-point-ref="delegatingAuthenticationEntryPoint" authentication-manager-ref="authenticationManager">
+        <intercept-url pattern="/login.html" access="permitAll"/>
+        <intercept-url pattern="/**" access="hasRole('ROLE_USER')" />
+        <form-login
+                always-use-default-target="true"
+                login-page='/login.html'
+                username-parameter="email"
+                password-parameter="password"
+                login-processing-url="/login"
+                authentication-success-handler-ref="authSuccessHandler"
+         />
+        <csrf disabled="true" />
+    </http>
+
+    <authentication-manager id="authenticationManager">
+        <authentication-provider ref="daoAuthenticationProvider"/>
+    </authentication-manager>
+
+    <beans:bean id="delegatingAuthenticationEntryPoint" class="org.springframework.security.web.authentication.DelegatingAuthenticationEntryPoint">
+        <beans:constructor-arg value="#{entryPointsHolder.convertedEntryPoints}" />
+        <beans:property name="defaultEntryPoint" ref="defaultLoginEntryPoint"/>
+    </beans:bean>
+
+    <beans:bean id="entryPointsHolder" class="org.sbezgin.p2016.spring.security.AuthenticationEntryPointsHolder">
+        <beans:constructor-arg>
+            <beans:map>
+                <beans:entry key="^/rest/.*$" value-ref="accessDeniedEntryPoint" />
+            </beans:map>
+        </beans:constructor-arg>
+    </beans:bean>
+    <beans:bean id="accessDeniedEntryPoint" class="org.springframework.security.web.authentication.Http403ForbiddenEntryPoint"/>
+    <beans:bean id="defaultLoginEntryPoint" class="org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint">
+        <beans:constructor-arg value="/login.html" />
+    </beans:bean>
+
+    <beans:bean id="daoAuthenticationProvider" class="org.springframework.security.authentication.dao.DaoAuthenticationProvider">
+        <beans:property name="userDetailsService" ref="userService" />
+    </beans:bean>
+
+    <beans:bean id="authSuccessHandler" class="org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler">
+        <beans:property name="defaultTargetUrl" value="/main.html"/>
+    </beans:bean>
+
+</beans:beans>

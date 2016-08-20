@@ -1,23 +1,48 @@
 package org.sbezgin.p2016.service.impl;
 
+import org.apache.commons.lang3.StringUtils;
 import org.sbezgin.p2016.common.P2016Exception;
 import org.sbezgin.p2016.db.dao.UserDAO;
 import org.sbezgin.p2016.db.dto.UserDTO;
 import org.sbezgin.p2016.db.entity.User;
+import org.sbezgin.p2016.service.UserService;
 import org.sbezgin.p2016.service.transformer.BeanTransformer;
 import org.sbezgin.p2016.service.transformer.BeanTransformerHolder;
-import org.sbezgin.p2016.service.UserService;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
-public class UserServiceImpl implements UserService {
+import java.util.Arrays;
+
+public class UserServiceImpl implements UserService, UserDetailsService {
 
     private UserDAO userDAO;
     private BeanTransformerHolder beanTransformerHolder;
 
     @Override
     public UserDTO getCurrentUser() {
-        UserDTO userDTO = new UserDTO();
-        userDTO.setId(111L);
-        return userDTO;
+        UsernamePasswordAuthenticationToken auth = (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+        org.springframework.security.core.userdetails.User principal = (org.springframework.security.core.userdetails.User) auth.getPrincipal();
+        if (principal != null && StringUtils.isNotEmpty(principal.getUsername())) {
+            UserDTO userDTO = getUserByEmail(principal.getUsername());
+            if (userDTO == null) {
+                throw new P2016Exception("Cannot find user by email: " + principal.getUsername());
+            }
+            return userDTO;
+        }
+        return null;
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        UserDTO userDTO = getUserByEmail(username);
+        return new org.springframework.security.core.userdetails.User(
+                username,
+                userDTO.getPassword(),
+                Arrays.asList(() -> "ROLE_USER")//TODO java8
+        );
     }
 
     @Override

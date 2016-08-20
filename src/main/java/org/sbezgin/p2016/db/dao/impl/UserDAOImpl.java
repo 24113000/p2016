@@ -5,7 +5,10 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.sbezgin.p2016.db.dao.UserDAO;
 import org.sbezgin.p2016.db.entity.User;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
+@Transactional(propagation = Propagation.SUPPORTS)
 public class UserDAOImpl implements UserDAO {
 
     private SessionFactory sessionFactory;

@@ -1,4 +1,4 @@
-package org.sbezgin.p2016.spring.security;
+package org.sbezgin.p2016.security.spring;
 
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.util.matcher.RegexRequestMatcher;

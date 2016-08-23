@@ -5,16 +5,20 @@ import org.sbezgin.p2016.common.P2016Exception;
 import org.sbezgin.p2016.db.dao.UserDAO;
 import org.sbezgin.p2016.db.dto.UserDTO;
 import org.sbezgin.p2016.db.entity.User;
+import org.sbezgin.p2016.security.UserRoles;
 import org.sbezgin.p2016.service.UserService;
 import org.sbezgin.p2016.service.transformer.BeanTransformer;
 import org.sbezgin.p2016.service.transformer.BeanTransformerHolder;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 
 public class UserServiceImpl implements UserService, UserDetailsService {
 
@@ -38,10 +42,18 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         UserDTO userDTO = getUserByEmail(username);
+        Collection<GrantedAuthority> authorities = new ArrayList<>();
+        authorities.add(new GrantedAuthority() {
+            @Override
+            public String getAuthority() {
+                return UserRoles.ROLE_USER.toString();
+            }
+        });
+
         return new org.springframework.security.core.userdetails.User(
                 username,
                 userDTO.getPassword(),
-                Arrays.asList(() -> "ROLE_USER")//TODO java8
+                authorities//TODO java8
         );
     }
 

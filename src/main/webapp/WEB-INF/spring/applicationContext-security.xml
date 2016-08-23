@@ -29,7 +29,7 @@
         <beans:property name="defaultEntryPoint" ref="defaultLoginEntryPoint"/>
     </beans:bean>
 
-    <beans:bean id="entryPointsHolder" class="org.sbezgin.p2016.spring.security.AuthenticationEntryPointsHolder">
+    <beans:bean id="entryPointsHolder" class="org.sbezgin.p2016.security.spring.AuthenticationEntryPointsHolder">
         <beans:constructor-arg>
             <beans:map>
                 <beans:entry key="^/rest/.*$" value-ref="accessDeniedEntryPoint" />

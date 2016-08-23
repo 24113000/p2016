@@ -1,7 +1,5 @@
 package org.sbezgin.p2016.mvc;
 
-import org.sbezgin.p2016.common.CommonConstants;
-import org.sbezgin.p2016.db.dto.file.FolderDTO;
 import org.sbezgin.p2016.service.UserService;
 import org.sbezgin.p2016.service.file.FileService;
 import org.springframework.web.servlet.ModelAndView;
@@ -10,7 +8,7 @@ import org.springframework.web.servlet.mvc.AbstractController;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-public class P2016MainController extends AbstractController {
+public class MainPageController extends AbstractController {
 
     private FileService fileService;
     private UserService userService;

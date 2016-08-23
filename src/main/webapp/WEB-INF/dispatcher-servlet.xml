@@ -19,7 +19,7 @@ http://www.springframework.org/schema/mvc http://www.springframework.org/schema/
     <!-- Controllers -->
     <bean name="loginController" class="org.sbezgin.p2016.mvc.LoginController"/>
 
-    <bean name="mainController" class="org.sbezgin.p2016.mvc.P2016MainController">
+    <bean name="mainController" class="org.sbezgin.p2016.mvc.MainPageController">
         <property name="fileService" ref="fileService"/>
         <property name="userService" ref="userService"/>
     </bean>

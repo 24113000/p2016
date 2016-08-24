@@ -1,4 +1,4 @@
-package org.sbezgin.p2016.service.file.impl;
+package org.sbezgin.p2016.service.file;
 
 import org.sbezgin.p2016.common.CommonConstants;
 import org.sbezgin.p2016.common.P2016Exception;
@@ -13,12 +13,11 @@ import org.sbezgin.p2016.db.entity.Permission;
 import org.sbezgin.p2016.db.entity.file.AbstractFile;
 import org.sbezgin.p2016.db.entity.file.Folder;
 import org.sbezgin.p2016.db.entity.file.TextFile;
-import org.sbezgin.p2016.service.file.*;
-import org.sbezgin.p2016.service.impl.UserServiceImpl;
+import org.sbezgin.p2016.service.UserServiceImpl;
 import org.sbezgin.p2016.service.transformer.BeanTransformer;
 import org.sbezgin.p2016.service.transformer.BeanTransformerHolder;
-import org.sbezgin.p2016.service.transformer.impl.AbstractFileTransformer;
-import org.sbezgin.p2016.service.transformer.impl.TextFileTransformerImpl;
+import org.sbezgin.p2016.service.transformer.AbstractFileTransformer;
+import org.sbezgin.p2016.service.transformer.TextFileTransformerImpl;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 

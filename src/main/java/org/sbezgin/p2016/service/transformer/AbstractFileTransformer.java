@@ -1,4 +1,4 @@
-package org.sbezgin.p2016.service.transformer.impl;
+package org.sbezgin.p2016.service.transformer;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.sbezgin.p2016.db.dto.PermissionDTO;

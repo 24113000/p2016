@@ -1,4 +1,4 @@
-package org.sbezgin.p2016.service.impl;
+package org.sbezgin.p2016.service;
 
 import org.apache.commons.lang3.StringUtils;
 import org.sbezgin.p2016.common.P2016Exception;

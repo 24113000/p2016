@@ -1,4 +1,4 @@
-package org.sbezgin.p2016.service.transformer.impl;
+package org.sbezgin.p2016.service.transformer;
 
 import org.apache.commons.collections.BidiMap;
 import org.apache.commons.collections.bidimap.DualHashBidiMap;

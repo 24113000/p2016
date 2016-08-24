@@ -12,7 +12,7 @@
     <!--File Transformers-->
     <bean name="dozer" class="org.dozer.DozerBeanMapper" />
 
-    <bean name="transformerHolder" class="org.sbezgin.p2016.service.transformer.impl.BeanTransformerHolderImpl">
+    <bean name="transformerHolder" class="org.sbezgin.p2016.service.transformer.BeanTransformerHolderImpl">
         <property name="generalTransformer" ref="generalBeanTransformer"/>
         <property name="mappedTransformers">
             <map>
@@ -24,7 +24,7 @@
         </property>
     </bean>
 
-    <bean name="generalBeanTransformer" class="org.sbezgin.p2016.service.transformer.impl.GeneralBeanTransformerImpl">
+    <bean name="generalBeanTransformer" class="org.sbezgin.p2016.service.transformer.GeneralBeanTransformerImpl">
         <property name="dozerBeanMapper" ref="dozer"/>
         <property name="beanMap">
             <map>
@@ -34,16 +34,16 @@
         </property>
     </bean>
 
-    <bean name="textFileTransformer" class="org.sbezgin.p2016.service.transformer.impl.TextFileTransformerImpl" />
-    <bean name="folderTransformer" class="org.sbezgin.p2016.service.transformer.impl.FolderTransformerImpl" />
+    <bean name="textFileTransformer" class="org.sbezgin.p2016.service.transformer.TextFileTransformerImpl" />
+    <bean name="folderTransformer" class="org.sbezgin.p2016.service.transformer.FolderTransformerImpl" />
 
     <!-- services -->
-    <bean name="fileService" class="org.sbezgin.p2016.service.file.impl.FileServiceImpl">
+    <bean name="fileService" class="org.sbezgin.p2016.service.file.FileServiceImpl">
         <property name="fileDAO" ref="fileDAO" />
         <property name="userService" ref="userService" />
         <property name="beanTransformerHolder" ref="transformerHolder"/>
     </bean>
-    <bean id="userService" class="org.sbezgin.p2016.service.impl.UserServiceImpl">
+    <bean id="userService" class="org.sbezgin.p2016.service.UserServiceImpl">
         <property name="userDAO" ref="userDAO"/>
         <property name="beanTransformerHolder" ref="transformerHolder"/>
     </bean>

@@ -28,13 +28,15 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Override
     public UserDTO getCurrentUser() {
         UsernamePasswordAuthenticationToken auth = (UsernamePasswordAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
-        org.springframework.security.core.userdetails.User principal = (org.springframework.security.core.userdetails.User) auth.getPrincipal();
-        if (principal != null && StringUtils.isNotEmpty(principal.getUsername())) {
-            UserDTO userDTO = getUserByEmail(principal.getUsername());
-            if (userDTO == null) {
-                throw new P2016Exception("Cannot find user by email: " + principal.getUsername());
+        if (auth != null) {
+            org.springframework.security.core.userdetails.User principal = (org.springframework.security.core.userdetails.User) auth.getPrincipal();
+            if (principal != null && StringUtils.isNotEmpty(principal.getUsername())) {
+                UserDTO userDTO = getUserByEmail(principal.getUsername());
+                if (userDTO == null) {
+                    throw new P2016Exception("Cannot find user by email: " + principal.getUsername());
+                }
+                return userDTO;
             }
-            return userDTO;
         }
         return null;
     }

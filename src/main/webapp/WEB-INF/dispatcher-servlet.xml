@@ -23,7 +23,7 @@ http://www.springframework.org/schema/mvc http://www.springframework.org/schema/
         <property name="fileService" ref="fileService"/>
         <property name="userService" ref="userService"/>
     </bean>
-    <!-- Resolves view names to protected .jsp resources within the /WEB-INF/views directory -->
+    <!-- Resolves view names to protected .jsp resources within the /WEB-INF/jsp directory -->
     <bean id="viewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
         <property name="prefix" value="/WEB-INF/jsp/"/>
         <property name="suffix" value=".jsp"/>
